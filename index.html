@@ -3,639 +3,902 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trobai - 회사 정보</title>
+    <title>Trobai · AI로 일상을 바꾸는 서비스를 만듭니다</title>
+    <meta name="description" content="Trobai는 AI 기반 서비스를 개발하는 스타트업입니다. 첫 번째 서비스 AirNotte는 대화형 AI 여행 플래너입니다.">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #ffffff;
+            --bg-soft: #f7f9fb;
+            --bg-softer: #fbfcfe;
+            --text: #161b26;
+            --text-soft: #5b6573;
+            --text-faint: #8a93a2;
+            --border: #e9edf2;
+            --border-strong: #dde3ea;
+            /* Trobai 회사 브랜드 = 하늘색 계열 (포인트 컬러로만 사용) */
+            --accent: #2c6fb5;
+            --accent-2: #7eb8da;
+            --accent-soft: #eaf3fb;
+            --shadow-sm: 0 1px 2px rgba(22, 27, 38, 0.04), 0 2px 8px rgba(22, 27, 38, 0.04);
+            --shadow-md: 0 4px 24px rgba(22, 27, 38, 0.07);
+            --radius: 16px;
+            --radius-lg: 22px;
+            --maxw: 1120px;
         }
+
+        html { scroll-behavior: smooth; }
 
         body {
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            color: #1a1a1a;
-            background: linear-gradient(135deg, #f0f7ff 0%, #e8f4fd 50%, #f5faff 100%);
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
             min-height: 100vh;
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
         }
 
-        .tab-content {
-            flex: 1;
-        }
+        a { color: inherit; text-decoration: none; }
 
-        /* Header */
+        /* ---------- Header ---------- */
         .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1.5rem 2rem;
-            box-shadow: 0 2px 20px rgba(100, 149, 237, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: saturate(180%) blur(14px);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-inner {
+            max-width: var(--maxw); margin: 0 auto;
+            padding: 0.85rem 1.5rem;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 1rem;
+        }
+        .logo { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; }
+        .logo-mark {
+            width: 34px; height: 34px; border-radius: 9px;
+            background: linear-gradient(135deg, #2c6fb5 0%, #7eb8da 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 1.05rem; font-weight: 800;
+            box-shadow: 0 2px 8px rgba(44, 111, 181, 0.28);
+        }
+        .logo-text { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text); }
+
+        /* Nav */
+        .nav { display: flex; align-items: center; gap: 0.25rem; }
+        .nav-link {
+            position: relative;
+            padding: 0.5rem 0.9rem; border-radius: 9px;
+            font-size: 0.94rem; font-weight: 600; color: var(--text-soft);
+            background: none; border: none; cursor: pointer; font-family: inherit;
+            transition: color .18s, background .18s;
+            display: inline-flex; align-items: center; gap: 0.3rem;
+        }
+        .nav-link:hover { color: var(--text); background: var(--bg-soft); }
+        .nav-link.active { color: var(--accent); }
+        .nav-link .caret { font-size: 0.65rem; transition: transform .2s; opacity: .7; }
+
+        /* Dropdown */
+        .dropdown { position: relative; }
+        .dropdown-menu {
+            position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(6px);
+            min-width: 268px;
+            background: #fff; border: 1px solid var(--border); border-radius: 14px;
+            box-shadow: var(--shadow-md);
+            padding: 0.5rem; opacity: 0; visibility: hidden; transition: opacity .18s, transform .18s;
+            z-index: 120;
+        }
+        .dropdown-menu.open { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+        @media (hover: hover) {
+            .dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+            .dropdown:hover .caret { transform: rotate(180deg); }
+        }
+        .dropdown-menu.open ~ * .caret { transform: rotate(180deg); }
+        .service-item {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.7rem 0.75rem; border-radius: 10px; cursor: pointer;
+            transition: background .15s;
+        }
+        .service-item:hover { background: var(--bg-soft); }
+        .service-item.is-soon { cursor: not-allowed; opacity: 0.72; }
+        .service-item.is-soon:hover { background: none; }
+        .service-ico {
+            width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; font-size: 1.15rem;
+        }
+        .service-ico.air { background: linear-gradient(135deg, #fb923c, #f97316); color: #fff; }
+        .service-ico.soon { background: var(--bg-soft); color: var(--text-faint); border: 1px solid var(--border); }
+        .service-meta { display: flex; flex-direction: column; line-height: 1.3; }
+        .service-name { font-weight: 700; font-size: 0.95rem; color: var(--text); }
+        .service-desc { font-size: 0.8rem; color: var(--text-faint); }
+        .badge-soon {
+            margin-left: auto; font-size: 0.68rem; font-weight: 700; color: var(--text-faint);
+            background: var(--bg-soft); border: 1px solid var(--border); border-radius: 999px;
+            padding: 0.1rem 0.5rem;
         }
 
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .hamburger {
+            display: none; background: none; border: none; cursor: pointer;
+            width: 40px; height: 40px; border-radius: 9px; font-size: 1.3rem; color: var(--text);
         }
+        .hamburger:hover { background: var(--bg-soft); }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
+        /* ---------- Sections ---------- */
+        .section { display: none; }
+        .section.active { display: block; animation: fade .35s ease; }
+        @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #7eb8da 0%, #a8d4ea 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
+        .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 1.5rem; }
 
-        .logo-text {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #2c5282;
-            letter-spacing: -0.5px;
-        }
-
-        /* Tab Navigation */
-        .tab-nav {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .tab-btn {
-            padding: 0.625rem 1.25rem;
-            border: none;
-            background: transparent;
-            color: #718096;
-            font-size: 0.9375rem;
-            font-weight: 500;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .tab-btn:hover {
-            background: #e8f4fd;
-            color: #2c5282;
-        }
-
-        .tab-btn.active {
-            background: linear-gradient(135deg, #7eb8da 0%, #a8d4ea 100%);
-            color: #fff;
-        }
-
-        /* Tab Content */
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Hero Section */
+        /* Hero */
         .hero {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 4rem 2rem;
-            text-align: center;
+            text-align: center; padding: 5.5rem 1.5rem 4rem;
+            background:
+              radial-gradient(900px 360px at 50% -10%, var(--accent-soft) 0%, rgba(234,243,251,0) 70%),
+              var(--bg);
         }
-
+        .eyebrow {
+            display: inline-block; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.02em;
+            color: var(--accent); background: var(--accent-soft);
+            padding: 0.35rem 0.85rem; border-radius: 999px; margin-bottom: 1.25rem;
+        }
         .hero h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #2c5282;
-            margin-bottom: 1rem;
+            font-size: clamp(2rem, 5vw, 3.1rem); font-weight: 800; letter-spacing: -0.03em;
+            line-height: 1.18; color: var(--text); margin-bottom: 1.1rem;
         }
-
-        .hero p {
-            font-size: 1.125rem;
-            color: #4a5568;
-            max-width: 600px;
-            margin: 0 auto;
+        .hero h1 .grad {
+            background: linear-gradient(120deg, #2c6fb5, #7eb8da);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
         }
-
-        /* Main Content */
-        .main-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem 4rem;
-            display: grid;
-            gap: 2rem;
+        .hero p.lead {
+            font-size: clamp(1rem, 2vw, 1.18rem); color: var(--text-soft);
+            max-width: 640px; margin: 0 auto 2rem;
         }
-
-        /* Card Style */
-        .card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 2.5rem;
-            box-shadow: 0 4px 30px rgba(100, 149, 237, 0.08);
-            border: 1px solid rgba(126, 184, 218, 0.2);
+        .cta-row { display: flex; gap: 0.7rem; justify-content: center; flex-wrap: wrap; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 0.45rem;
+            padding: 0.8rem 1.5rem; border-radius: 11px; font-weight: 700; font-size: 0.98rem;
+            cursor: pointer; border: 1px solid transparent; font-family: inherit; transition: transform .15s, box-shadow .15s, background .15s;
         }
+        .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 6px 18px rgba(44, 111, 181, 0.26); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(44, 111, 181, 0.32); }
+        .btn-ghost { background: #fff; color: var(--text); border-color: var(--border-strong); }
+        .btn-ghost:hover { background: var(--bg-soft); transform: translateY(-2px); }
 
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid #e8f4fd;
+        /* Section heading */
+        .sec-head { text-align: center; max-width: 680px; margin: 0 auto 2.75rem; }
+        .sec-head .kicker { font-size: 0.82rem; font-weight: 700; color: var(--accent); letter-spacing: 0.04em; text-transform: uppercase; }
+        .sec-head h2 { font-size: clamp(1.6rem, 3.5vw, 2.2rem); font-weight: 800; letter-spacing: -0.02em; margin: 0.5rem 0 0.7rem; }
+        .sec-head p { color: var(--text-soft); font-size: 1.02rem; }
+
+        .block { padding: 4.5rem 0; }
+        .block.alt { background: var(--bg-soft); }
+
+        /* Service cards (home) */
+        .svc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
+        .svc-card {
+            background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 1.9rem; box-shadow: var(--shadow-sm); transition: transform .2s, box-shadow .2s, border-color .2s;
+            display: flex; flex-direction: column;
         }
+        .svc-card.live { cursor: pointer; }
+        .svc-card.live:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--border-strong); }
+        .svc-card .svc-top { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.1rem; }
+        .svc-logo { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+        .svc-logo.air { background: linear-gradient(135deg, #fb923c, #f97316); color: #fff; box-shadow: 0 4px 12px rgba(249,115,22,.3); }
+        .svc-logo.ph { background: var(--bg-soft); border: 1px dashed var(--border-strong); color: var(--text-faint); }
+        .svc-card h3 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; }
+        .svc-card .tag { font-size: 0.78rem; color: var(--text-faint); font-weight: 600; }
+        .svc-card p { color: var(--text-soft); font-size: 0.95rem; margin-bottom: 1.25rem; flex: 1; }
+        .svc-link { font-weight: 700; color: var(--accent); font-size: 0.92rem; display: inline-flex; align-items: center; gap: 0.3rem; }
+        .svc-link .arrow { transition: transform .2s; }
+        .svc-card.live:hover .arrow { transform: translateX(4px); }
+        .svc-soon-label { font-weight: 700; color: var(--text-faint); font-size: 0.9rem; }
 
-        .card-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #7eb8da 0%, #a8d4ea 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
+        /* Vision / info cards */
+        .vision-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; }
+        .vcard { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.7rem; box-shadow: var(--shadow-sm); }
+        .vcard .vico { font-size: 1.5rem; margin-bottom: 0.7rem; }
+        .tech-ico { width: 46px; height: 46px; border-radius: 12px; background: #fff3e9; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; margin-bottom: 0.8rem; }
+        .vcard h4 { font-size: 1.06rem; font-weight: 700; margin-bottom: 0.4rem; }
+        .vcard p { color: var(--text-soft); font-size: 0.92rem; }
+
+        /* Timeline (회사연혁) */
+        .timeline { max-width: 760px; margin: 0 auto; position: relative; padding-left: 1.5rem; }
+        .timeline::before { content: ''; position: absolute; left: 6px; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(var(--accent-2), var(--border)); }
+        .tl-item { position: relative; padding: 0 0 1.8rem 1.6rem; }
+        .tl-item::before { content: ''; position: absolute; left: -1.5rem; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); border: 3px solid #fff; box-shadow: 0 0 0 2px var(--accent-2); }
+        .tl-item:last-child { padding-bottom: 0; }
+        .tl-date { font-weight: 800; color: var(--accent); font-size: 0.95rem; }
+        .tl-title { font-weight: 700; margin-top: 0.15rem; }
+        .tl-desc { color: var(--text-soft); font-size: 0.92rem; }
+        .tl-item.future::before { background: #fff; box-shadow: 0 0 0 2px var(--border-strong); }
+        .tl-item.future .tl-date { color: var(--text-faint); }
+
+        /* ---------- AirNotte product section (orange theme) ---------- */
+        #airnotte { --accent: #f97316; --accent-2: #fb923c; --accent-soft: #fff3e9; }
+        .air-hero {
+            text-align: center; padding: 5rem 1.5rem 3.5rem;
+            background: radial-gradient(900px 380px at 50% -10%, #fff3e9 0%, rgba(255,243,233,0) 72%), var(--bg);
         }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #2c5282;
+        .air-logo-row { display: inline-flex; align-items: center; gap: 0.7rem; margin-bottom: 1.2rem; }
+        .air-logo {
+            width: 52px; height: 52px; border-radius: 14px;
+            background: linear-gradient(135deg, #fb923c, #f97316); color: #fff;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 800;
+            box-shadow: 0 6px 18px rgba(249,115,22,.35);
         }
+        .air-logo-name { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
+        .air-hero h1 { font-size: clamp(1.9rem, 4.5vw, 2.9rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 1rem; }
+        .air-hero h1 .grad { background: linear-gradient(120deg, #fb923c, #f97316); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .air-hero p { color: var(--text-soft); font-size: 1.1rem; max-width: 600px; margin: 0 auto 2rem; }
+        .btn-air { background: #f97316; color: #fff; box-shadow: 0 6px 18px rgba(249,115,22,.3); }
+        .btn-air:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(249,115,22,.38); }
 
-        /* Company Info Grid */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
+        .air-stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 2.5rem; margin-top: 2.5rem; }
+        .air-stat .num { font-size: 1.9rem; font-weight: 800; color: #f97316; }
+        .air-stat .lbl { font-size: 0.85rem; color: var(--text-soft); }
+
+        /* App screenshot frame */
+        .app-frame {
+            border-radius: 16px; overflow: hidden; border: 1px solid var(--border);
+            box-shadow: var(--shadow-md); background: #fff; line-height: 0;
         }
+        .app-frame img { width: 100%; height: auto; display: block; }
 
-        .info-item {
-            display: flex;
-            flex-direction: column;
-            gap: 0.375rem;
+        /* Feature rows */
+        .feature-row {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;
+            padding: 3.25rem 0; border-bottom: 1px solid var(--border);
         }
-
-        .info-label {
-            font-size: 0.875rem;
-            color: #718096;
-            font-weight: 500;
+        .feature-row:last-child { border-bottom: none; }
+        .feature-row.flip .feature-text { order: 2; }
+        .feature-row.flip .feature-media { order: 1; }
+        .feature-step {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 30px; height: 30px; border-radius: 9px; background: #fff3e9; color: #f97316;
+            font-weight: 800; font-size: 0.9rem; margin-bottom: 0.9rem;
         }
+        .feature-text h3 { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.7rem; }
+        .feature-text p { color: var(--text-soft); font-size: 1rem; }
+        .feature-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
+        .feature-tags span { font-size: 0.82rem; font-weight: 600; color: #c2410c; background: #fff3e9; border-radius: 999px; padding: 0.3rem 0.75rem; }
 
-        .info-value {
-            font-size: 1.0625rem;
-            color: #1a1a1a;
-            font-weight: 500;
-        }
+        .air-cta { text-align: center; padding: 4rem 1.5rem; }
 
-        /* Service Description */
-        .service-description {
-            color: #4a5568;
-            font-size: 1.0625rem;
-            line-height: 1.8;
-        }
-
-        .service-description p {
-            margin-bottom: 1rem;
-        }
-
-        .service-description p:last-child {
-            margin-bottom: 0;
-        }
-
-        /* Feature List */
-        .feature-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.75rem;
-            padding: 1rem;
-            background: #f0f7ff;
-            border-radius: 12px;
-        }
-
-        .feature-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #7eb8da 0%, #a8d4ea 100%);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            font-size: 1rem;
-        }
-
-        .feature-text {
-            font-size: 0.9375rem;
-            color: #4a5568;
-        }
-
-        .feature-text strong {
-            color: #2c5282;
-            display: block;
-            margin-bottom: 0.25rem;
-        }
-
-        /* Disclosure Board Styles */
-        .disclosure-header {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 3rem 2rem 2rem;
-        }
-
-        .disclosure-header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #2c5282;
-            margin-bottom: 0.5rem;
-        }
-
-        .disclosure-header p {
-            color: #718096;
-            font-size: 1rem;
-        }
-
-        .board-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem 4rem;
-        }
-
+        /* ---------- Disclosure board (기존 구조 유지) ---------- */
         .board-table {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 30px rgba(100, 149, 237, 0.08);
-            border: 1px solid rgba(126, 184, 218, 0.2);
+            background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+            overflow: hidden; box-shadow: var(--shadow-sm);
         }
-
-        .board-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
+        .board-table table { width: 100%; border-collapse: collapse; }
         .board-table th {
-            background: #f0f7ff;
-            padding: 1rem 1.5rem;
-            text-align: left;
-            font-weight: 600;
-            color: #2c5282;
-            font-size: 0.9375rem;
-            border-bottom: 2px solid #e8f4fd;
-            white-space: nowrap;
+            background: var(--bg-soft); padding: 1rem 1.5rem; text-align: left;
+            font-weight: 700; color: var(--text); font-size: 0.9rem; border-bottom: 1px solid var(--border); white-space: nowrap;
+        }
+        .board-table td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); color: var(--text-soft); font-size: 0.92rem; }
+        .board-table tr:last-child td { border-bottom: none; }
+        .board-table tbody tr:hover td { background: var(--bg-softer); }
+        .board-table .col-no { width: 70px; text-align: center; }
+        .board-table .col-date { width: 120px; text-align: center; }
+        .board-table .col-file { width: 110px; text-align: center; }
+        .board-table .col-title { color: var(--text); font-weight: 600; }
+        .file-link { display: inline-flex; align-items: center; gap: 0.35rem; color: var(--accent); font-weight: 600; }
+        .file-link:hover { text-decoration: underline; }
+
+        /* ---------- Contact form ---------- */
+        .contact-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 3rem; align-items: start; }
+        .contact-info h2 { font-size: clamp(1.6rem, 3.5vw, 2.1rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.8rem; }
+        .contact-info p { color: var(--text-soft); margin-bottom: 1.6rem; }
+        .contact-detail { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.9rem; color: var(--text-soft); font-size: 0.95rem; }
+        .contact-detail .ci { width: 34px; height: 34px; border-radius: 9px; background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .contact-detail a:hover { color: var(--accent); }
+
+        .form-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-md); }
+        .field { margin-bottom: 1.1rem; }
+        .field label { display: block; font-size: 0.88rem; font-weight: 700; margin-bottom: 0.4rem; }
+        .field input, .field textarea {
+            width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--border-strong); border-radius: 11px;
+            font-family: inherit; font-size: 0.96rem; color: var(--text); background: var(--bg-softer); transition: border-color .15s, box-shadow .15s;
+        }
+        .field input:focus, .field textarea:focus { outline: none; border-color: var(--accent-2); box-shadow: 0 0 0 3px var(--accent-soft); background: #fff; }
+        .field textarea { resize: vertical; min-height: 150px; }
+        .hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+        .submit-btn { width: 100%; justify-content: center; }
+        .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+        .form-status { margin-top: 1rem; font-size: 0.92rem; font-weight: 600; min-height: 1.2rem; }
+        .form-status.success { color: #15803d; }
+        .form-status.error { color: #dc2626; }
+
+        /* ---------- Footer ---------- */
+        .footer { background: #11161f; color: #c4ccd6; margin-top: auto; padding: 3rem 1.5rem 2rem; }
+        .footer-inner { max-width: var(--maxw); margin: 0 auto; }
+        .footer-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2rem; padding-bottom: 2rem; border-bottom: 1px solid #232a36; }
+        .footer-brand .fb-logo { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.8rem; }
+        .footer-brand .logo-text { color: #fff; }
+        .footer-brand p { font-size: 0.9rem; color: #8a93a2; max-width: 320px; }
+        .footer-info { display: grid; gap: 0.5rem; font-size: 0.9rem; }
+        .footer-info .row { display: flex; gap: 0.6rem; }
+        .footer-info .k { color: #6b7585; min-width: 64px; }
+        .footer-info .v { color: #c4ccd6; }
+        .footer-info a:hover { color: #fff; }
+        .footer-bottom { padding-top: 1.5rem; font-size: 0.82rem; color: #6b7585; text-align: center; }
+
+        /* Reveal animation */
+        .reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s ease; }
+        .reveal.in-view { opacity: 1; transform: none; }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .reveal { opacity: 1; transform: none; transition: none; }
+            .section.active { animation: none; }
         }
 
-        .board-table td {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid #e8f4fd;
-            color: #4a5568;
-            font-size: 0.9375rem;
+        /* ---------- Responsive ---------- */
+        @media (max-width: 860px) {
+            .feature-row { grid-template-columns: 1fr; gap: 1.5rem; padding: 2.5rem 0; }
+            .feature-row.flip .feature-text { order: 0; }
+            .feature-row.flip .feature-media { order: 0; }
+            .contact-grid { grid-template-columns: 1fr; gap: 2rem; }
         }
-
-        .board-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .board-table tr:hover td {
-            background: #f8fbff;
-        }
-
-        .board-table .col-no {
-            width: 80px;
-            text-align: center;
-        }
-
-        .board-table .col-title {
-            width: auto;
-        }
-
-        .board-table .col-date {
-            width: 120px;
-            text-align: center;
-        }
-
-        .board-table .col-file {
-            width: 100px;
-            text-align: center;
-            white-space: nowrap;
-        }
-
-        .file-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.375rem;
-            color: #4a90a4;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .file-link:hover {
-            color: #2c5282;
-        }
-
-        .empty-message {
-            padding: 4rem 2rem;
-            text-align: center;
-            color: #718096;
-        }
-
-        .empty-message .empty-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .empty-message p {
-            font-size: 1rem;
-        }
-
-        /* Footer */
-        .footer {
-            background: #2c5282;
-            color: #fff;
-            padding: 2rem;
-            margin-top: 2rem;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-            text-align: center;
-        }
-
-        .footer-logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        .footer-contact {
-            font-size: 0.9375rem;
-            color: #a8d4ea;
-        }
-
-        .footer-contact a {
-            color: #a8d4ea;
-            text-decoration: none;
-        }
-
-        .footer-contact a:hover {
-            text-decoration: underline;
-        }
-
-        .footer-copyright {
-            font-size: 0.875rem;
-            color: #7eb8da;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
+        @media (max-width: 720px) {
+            .hamburger { display: flex; align-items: center; justify-content: center; }
+            .nav {
+                position: absolute; top: 100%; left: 0; right: 0;
+                flex-direction: column; align-items: stretch; gap: 0.2rem;
+                background: #fff; border-bottom: 1px solid var(--border);
+                padding: 0.6rem; box-shadow: var(--shadow-md);
+                display: none;
             }
-
-            .tab-nav {
-                order: 3;
-                width: 100%;
-                justify-content: center;
+            .nav.open { display: flex; }
+            .nav-link { justify-content: space-between; padding: 0.8rem 1rem; }
+            .dropdown { width: 100%; }
+            .dropdown-menu {
+                position: static; transform: none; opacity: 1; visibility: visible;
+                box-shadow: none; border: none; min-width: 0; padding: 0.2rem 0 0.2rem 0.5rem;
+                display: none;
             }
-
-            .hero h1 {
-                font-size: 1.875rem;
-            }
-
-            .hero p {
-                font-size: 1rem;
-            }
-
-            .card {
-                padding: 1.5rem;
-            }
-
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .board-table th,
-            .board-table td {
-                padding: 0.75rem 1rem;
-                font-size: 0.875rem;
-            }
-
-            .board-table .col-no {
-                width: 50px;
-            }
-
-            .board-table .col-date {
-                width: 90px;
-            }
-
-            .board-table .col-file {
-                width: 70px;
-            }
+            .dropdown-menu.open { display: block; transform: none; }
+            @media (hover: hover) { .dropdown:hover .dropdown-menu { display: none; } .dropdown-menu.open { display: block; } }
+            .air-stats { gap: 1.6rem; }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
+    <!-- ============ Header ============ -->
     <header class="header">
-        <div class="header-content">
-            <div class="logo">
-                <div class="logo-icon">✈️</div>
+        <div class="header-inner">
+            <div class="logo" onclick="switchSection('home', null)" role="button" tabindex="0" aria-label="Trobai 홈">
+                <div class="logo-mark">T</div>
                 <span class="logo-text">Trobai</span>
             </div>
-            <nav class="tab-nav">
-                <button class="tab-btn active" onclick="showTab('main')">메인</button>
-                <button class="tab-btn" onclick="showTab('disclosure')">공시</button>
+
+            <button class="hamburger" aria-label="메뉴 열기" aria-expanded="false" onclick="toggleMenu()">☰</button>
+
+            <nav class="nav" id="navMenu" aria-label="주요 메뉴">
+                <button class="nav-link" data-nav="history" onclick="switchSection('home','history','history-block')">회사연혁</button>
+
+                <div class="dropdown">
+                    <button class="nav-link" id="servicesBtn" data-nav="services"
+                            aria-haspopup="true" aria-expanded="false" aria-controls="servicesMenu"
+                            onclick="toggleDropdown(event)">
+                        서비스 <span class="caret">▾</span>
+                    </button>
+                    <ul class="dropdown-menu" id="servicesMenu" role="menu" aria-label="서비스 목록">
+                        <!-- 라이브 서비스 -->
+                        <li class="service-item" role="menuitem" tabindex="0"
+                            onclick="switchSection('airnotte','services')"
+                            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();switchSection('airnotte','services');}">
+                            <span class="service-ico air">✈️</span>
+                            <span class="service-meta">
+                                <span class="service-name">AirNotte</span>
+                                <span class="service-desc">AI 맞춤 여행 플래너</span>
+                            </span>
+                        </li>
+                        <!-- 준비중 서비스 (추가 시 이 블록을 복사해서 이름만 바꾸세요) -->
+                        <li class="service-item is-soon" role="menuitem" aria-disabled="true">
+                            <span class="service-ico soon">✦</span>
+                            <span class="service-meta">
+                                <span class="service-name">새로운 서비스</span>
+                                <span class="service-desc">준비 중입니다</span>
+                            </span>
+                            <span class="badge-soon">준비중</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <button class="nav-link" data-nav="disclosure" onclick="switchSection('disclosure','disclosure')">공시</button>
+                <button class="nav-link" data-nav="contact" onclick="switchSection('contact','contact')">문의하기</button>
             </nav>
         </div>
     </header>
 
-    <!-- Main Tab Content -->
-    <div id="main-tab" class="tab-content active">
-        <!-- Hero Section -->
+    <!-- ============ HOME ============ -->
+    <main id="home" class="section active">
+        <!-- Hero -->
         <section class="hero">
-            <h1>당신만의 여행을 설계하는 AI</h1>
-            <p>15가지 여행 성향 분석을 통해 나에게 딱 맞는 맞춤형 여행 계획을 제안합니다</p>
+            <span class="eyebrow">AI Product Studio</span>
+            <h1>AI로 일상을 바꾸는<br><span class="grad">서비스를 만듭니다</span></h1>
+            <p class="lead">Trobai는 인공지능 기술로 사람들의 일상을 더 편리하게 만드는 서비스를 개발합니다. 그 첫 번째가 대화형 AI 여행 플래너 <strong>AirNotte</strong>입니다.</p>
+            <div class="cta-row">
+                <button class="btn btn-primary" onclick="switchSection('airnotte','services')">AirNotte 살펴보기 →</button>
+                <button class="btn btn-ghost" onclick="switchSection('contact','contact')">문의하기</button>
+            </div>
         </section>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Company Info Card -->
-            <section class="card">
-                <div class="card-header">
-                    <div class="card-icon">🏢</div>
-                    <h2 class="card-title">회사 정보</h2>
+        <!-- Services -->
+        <section class="block alt">
+            <div class="wrap">
+                <div class="sec-head reveal">
+                    <span class="kicker">Our Services</span>
+                    <h2>Trobai의 서비스</h2>
+                    <p>지금은 AirNotte 하나지만, 앞으로 더 많은 AI 서비스가 이곳에 추가됩니다.</p>
                 </div>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <span class="info-label">회사명 (법인명)</span>
-                        <span class="info-value">Trobai</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">대표이사</span>
-                        <span class="info-value">조혜리</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">설립연월</span>
-                        <span class="info-value">2026년 1월</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">본점 소재지</span>
-                        <span class="info-value">서울특별시</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">공식 이메일</span>
-                        <span class="info-value">trobai@trobai.com</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">공식 웹사이트</span>
-                        <span class="info-value">trobai.com</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Service Description Card -->
-            <section class="card">
-                <div class="card-header">
-                    <div class="card-icon">💡</div>
-                    <h2 class="card-title">서비스 소개</h2>
-                </div>
-                <div class="service-description">
-                    <p>
-                        Trobai는 인공지능 기반의 개인 맞춤형 여행 계획 추천 서비스입니다.
-                        AI 챗봇과의 자연스러운 대화를 통해 사용자의 여행 성향을 15가지 기준으로 분석하고,
-                        이를 바탕으로 원하는 지역에 최적화된 여행 일정을 제안합니다.
-                    </p>
-                    <p>
-                        복잡한 설문 대신 대화형 인터페이스를 통해 여행 스타일, 선호 활동, 예산 범위,
-                        숙박 형태 등을 자연스럽게 파악하여 여행자 개개인에게 맞는 여행 경험을 설계합니다.
-                    </p>
-                </div>
-
-                <div class="feature-list">
-                    <div class="feature-item">
-                        <div class="feature-icon">💬</div>
-                        <div class="feature-text">
-                            <strong>AI 대화형 성향 분석</strong>
-                            자연스러운 대화로 15가지 여행 성향을 파악합니다
+                <div class="svc-grid">
+                    <div class="svc-card live reveal" onclick="switchSection('airnotte','services')">
+                        <div class="svc-top">
+                            <div class="svc-logo air">✈️</div>
+                            <div>
+                                <h3>AirNotte</h3>
+                                <span class="tag">AI 여행 플래너</span>
+                            </div>
                         </div>
+                        <p>대화 몇 번으로 나의 여행 성향을 분석하고, 동선·검증까지 끝낸 완성형 일정을 만들어 줍니다.</p>
+                        <span class="svc-link">자세히 보기 <span class="arrow">→</span></span>
                     </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">🎯</div>
-                        <div class="feature-text">
-                            <strong>맞춤형 여행 계획</strong>
-                            분석된 성향을 기반으로 최적의 일정을 제안합니다
+                    <div class="svc-card reveal">
+                        <div class="svc-top">
+                            <div class="svc-logo ph">✦</div>
+                            <div>
+                                <h3>새로운 서비스</h3>
+                                <span class="tag">Coming Soon</span>
+                            </div>
                         </div>
+                        <p>Trobai의 다음 AI 서비스를 준비하고 있습니다. 기대해 주세요.</p>
+                        <span class="svc-soon-label">준비 중</span>
                     </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">🗺️</div>
-                        <div class="feature-text">
-                            <strong>지역 맞춤 추천</strong>
-                            원하는 여행지에 맞는 상세 계획을 제공합니다
+                    <div class="svc-card reveal">
+                        <div class="svc-top">
+                            <div class="svc-logo ph">✦</div>
+                            <div>
+                                <h3>새로운 서비스</h3>
+                                <span class="tag">Coming Soon</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">⚡</div>
-                        <div class="feature-text">
-                            <strong>빠른 계획 수립</strong>
-                            몇 분의 대화로 완성된 여행 계획을 받아보세요
-                        </div>
+                        <p>더 많은 영역에서 AI로 문제를 풀어갈 예정입니다.</p>
+                        <span class="svc-soon-label">준비 중</span>
                     </div>
                 </div>
-            </section>
-        </main>
-    </div>
+            </div>
+        </section>
 
-    <!-- Disclosure Tab Content -->
-    <div id="disclosure-tab" class="tab-content">
-        <div class="disclosure-header">
-            <h1>📋 공시</h1>
-            <p>회사 관련 공시 자료를 확인하실 수 있습니다</p>
-        </div>
+        <!-- 회사 기술 정체성 -->
+        <section class="block">
+            <div class="wrap">
+                <div class="sec-head reveal">
+                    <span class="kicker">Technology</span>
+                    <h2>기술로 증명하는 팀</h2>
+                    <p>Trobai는 수학과 알고리즘에 뿌리를 둔 깊은 AI 기술력으로, 그럴듯한 결과가 아니라 믿을 수 있는 결과를 만듭니다.</p>
+                </div>
+                <div class="vision-grid">
+                    <div class="vcard reveal"><div class="vico">🧮</div><h4>수학 기반 AI</h4><p>뉴로심볼릭(Neurosymbolic)처럼 수학·알고리즘에 기반한 기술로, 검증 가능한 AI를 추구합니다.</p></div>
+                    <div class="vcard reveal"><div class="vico">🔬</div><h4>깊이 있는 기술력</h4><p>유행을 좇기보다, 문제를 근본부터 푸는 기술에 집중합니다.</p></div>
+                    <div class="vcard reveal"><div class="vico">🚀</div><h4>기술을 제품으로</h4><p>연구로 끝내지 않고, 사람들이 실제로 쓰는 서비스로 구현합니다.</p></div>
+                </div>
+            </div>
+        </section>
 
-        <div class="board-container">
-            <div class="board-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="col-no">번호</th>
-                            <th class="col-title">제목</th>
-                            <th class="col-date">등록일</th>
-                            <th class="col-file">첨부파일</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="col-no">1</td>
-                            <td class="col-title">설립공고</td>
-                            <td class="col-date">2026.01.19</td>
-                            <td class="col-file">
-                                <a href="./pdf/설립공고.pdf" class="file-link" target="_blank">
-                                    📎 PDF
-                                </a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <!-- 회사연혁 -->
+        <section class="block alt" id="history-block">
+            <div class="wrap">
+                <div class="sec-head reveal">
+                    <span class="kicker">History</span>
+                    <h2>회사 연혁</h2>
+                    <p>Trobai가 걸어온 길과 앞으로의 방향입니다.</p>
+                </div>
+                <div class="timeline reveal">
+                    <div class="tl-item">
+                        <div class="tl-date">2026. 01</div>
+                        <div class="tl-title">Trobai 설립</div>
+                        <div class="tl-desc">AI 기반 서비스 개발을 목표로 법인을 설립했습니다.</div>
+                    </div>
+                    <div class="tl-item">
+                        <div class="tl-date">2026. 05</div>
+                        <div class="tl-title">관광 오픈이노베이션 공모 사업 선정</div>
+                        <div class="tl-desc">관광 오픈이노베이션 공모 사업에 선정되었습니다.</div>
+                    </div>
+                    <div class="tl-item future">
+                        <div class="tl-date">Now</div>
+                        <div class="tl-title">AirNotte 준비 중</div>
+                        <div class="tl-desc">대화형 AI 여행 플래너 AirNotte를 개발하고 있습니다.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ============ AIRNOTTE ============ -->
+    <section id="airnotte" class="section">
+        <div class="air-hero">
+            <div class="air-logo-row">
+                <div class="air-logo">✈️</div>
+                <span class="air-logo-name">AirNotte</span>
+            </div>
+            <h1>대화 몇 번이면,<br><span class="grad">완성형 여행 일정</span></h1>
+            <p>AirNotte는 AI와의 대화로 당신의 여행 성향을 분석하고, 일정·동선·실제 정보 검증까지 한 번에 끝내주는 맞춤형 여행 플래너입니다.</p>
+            <div class="cta-row">
+                <button class="btn btn-air" onclick="switchSection('contact','contact')">도입·협업 문의 →</button>
+            </div>
+            <div class="air-stats">
+                <div class="air-stat"><div class="num">15</div><div class="lbl">가지 여행 성향 분석</div></div>
+                <div class="air-stat"><div class="num">대화형</div><div class="lbl">간편한 일정 생성</div></div>
+                <div class="air-stat"><div class="num">실시간</div><div class="lbl">운영정보·날씨 검증</div></div>
             </div>
         </div>
-    </div>
 
-    <!-- Footer -->
+        <div class="wrap">
+            <!-- 1. 대화형 성향 분석 -->
+            <div class="feature-row">
+                <div class="feature-text reveal">
+                    <span class="feature-step">1</span>
+                    <h3>대화형 성향 분석</h3>
+                    <p>복잡한 설문은 그만. AI 플래너와 자연스럽게 대화하면 여행 스타일, 예산, 숙박 취향까지 15가지 기준으로 당신의 성향을 분석합니다.</p>
+                    <div class="feature-tags"><span>현지 문화 몰입형</span><span>15가지 프로파일</span><span>신뢰도 분석</span></div>
+                </div>
+                <div class="feature-media reveal">
+                    <div class="app-frame">
+                        <img src="./img/airnotte-chat-profile.webp" width="1100" height="688" alt="AirNotte AI 채팅과 15가지 여행 성향 분석 화면" decoding="async">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 맞춤 일정 생성 -->
+            <div class="feature-row flip">
+                <div class="feature-text reveal">
+                    <span class="feature-step">2</span>
+                    <h3>AI 맞춤 일정 자동 생성</h3>
+                    <p>분석된 성향을 바탕으로 며칠치 여행 일정을 한 번에 만들어 줍니다. 날짜별 테마와 동선까지 고려한 현실적인 코스를 제안합니다.</p>
+                    <div class="feature-tags"><span>일자별 자동 구성</span><span>테마 기반 추천</span></div>
+                </div>
+                <div class="feature-media reveal">
+                    <div class="app-frame">
+                        <img src="./img/airnotte-itinerary-3day.webp" width="1100" height="838" alt="AirNotte 3일 전체 여행 일정 자동 생성 화면" loading="lazy" decoding="async">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 일자별 상세 -->
+            <div class="feature-row">
+                <div class="feature-text reveal">
+                    <span class="feature-step">3</span>
+                    <h3>일자별 상세 코스</h3>
+                    <p>각 날짜마다 시간대별 방문지, 이동 정보, 추천 활동을 상세하게 정리합니다. 날씨와 메뉴 정보까지 한눈에 확인하세요.</p>
+                    <div class="feature-tags"><span>시간대별 일정</span><span>방문지 상세정보</span></div>
+                </div>
+                <div class="feature-media reveal">
+                    <div class="app-frame">
+                        <img src="./img/airnotte-itinerary-day.webp" width="1100" height="892" alt="AirNotte 일자별 상세 일정 화면" loading="lazy" decoding="async">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. 장소 추천 -->
+            <div class="feature-row flip">
+                <div class="feature-text reveal">
+                    <span class="feature-step">4</span>
+                    <h3>장소 추천 &amp; 정보</h3>
+                    <p>가볼 만한 명소·맛집을 사진과 함께 추천하고, 영업시간·접근성 같은 실용 정보를 제공해 선택을 돕습니다.</p>
+                    <div class="feature-tags"><span>명소·맛집</span><span>실용 정보</span></div>
+                </div>
+                <div class="feature-media reveal">
+                    <div class="app-frame">
+                        <img src="./img/airnotte-poi-list.webp" width="1100" height="1745" alt="AirNotte 추천 장소 리스트 화면" loading="lazy" decoding="async">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. 동선 지도 -->
+            <div class="feature-row">
+                <div class="feature-text reveal">
+                    <span class="feature-step">5</span>
+                    <h3>동선 최적화 지도</h3>
+                    <p>하루 동선을 지도 위에 그려 이동 거리와 시간을 최소화합니다. 헛걸음 없는 효율적인 여행을 설계합니다.</p>
+                    <div class="feature-tags"><span>지도 시각화</span><span>이동거리 최소화</span></div>
+                </div>
+                <div class="feature-media reveal">
+                    <div class="app-frame">
+                        <img src="./img/airnotte-route.webp" width="1100" height="692" alt="AirNotte 지도 동선 최적화 화면" loading="lazy" decoding="async">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. 검증 -->
+            <div class="feature-row flip">
+                <div class="feature-text reveal">
+                    <span class="feature-step">6</span>
+                    <h3>실시간 정보 검증</h3>
+                    <p>운영시간, 휴무일, 날씨를 실제 데이터로 자동 검증합니다. AI가 만든 일정이지만 믿고 떠날 수 있습니다.</p>
+                    <div class="feature-tags"><span>운영시간 확인</span><span>휴무·날씨 검증</span></div>
+                </div>
+                <div class="feature-media reveal">
+                    <div class="app-frame">
+                        <img src="./img/airnotte-verify.webp" width="1100" height="891" alt="AirNotte 일정 정보 검증 결과 화면" loading="lazy" decoding="async">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AirNotte 기술 -->
+        <div class="block alt">
+            <div class="wrap">
+                <div class="sec-head reveal">
+                    <span class="kicker">Technology</span>
+                    <h2>AirNotte를 움직이는 기술</h2>
+                    <p>화면 뒤에서는 이런 기술이 일정을 더 정확하고 믿을 수 있게 만듭니다.</p>
+                </div>
+                <div class="vision-grid">
+                    <div class="vcard reveal"><div class="tech-ico">🧮</div><h4>뉴로심볼릭 알고리즘</h4><p>생성형 AI에 수학·규칙 기반 검증을 결합해, ‘그럴듯한 추천’이 아니라 근거 있는 추천을 만듭니다.</p></div>
+                    <div class="vcard reveal"><div class="tech-ico">🗺️</div><h4>OSRM 실제 도로 내비게이션</h4><p>실제 도로망 데이터(OSRM)로 이동 거리와 시간을 계산해, 헛걸음 없는 현실적인 동선을 설계합니다.</p></div>
+                    <div class="vcard reveal"><div class="tech-ico">🛰️</div><h4>실시간 데이터 검증</h4><p>운영시간·휴무·날씨 같은 실제 데이터와 대조해 일정을 자동으로 검증합니다.</p></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="air-cta">
+            <div class="sec-head reveal" style="margin-bottom:1.5rem;">
+                <h2 style="font-size:clamp(1.5rem,3.5vw,2rem)">AirNotte와 함께하고 싶으세요?</h2>
+                <p>도입, 제휴, 투자 등 어떤 이야기든 환영합니다.</p>
+            </div>
+            <button class="btn btn-air" onclick="switchSection('contact','contact')">문의하기 →</button>
+        </div>
+    </section>
+
+    <!-- ============ DISCLOSURE (기존 공시 구조 유지) ============ -->
+    <section id="disclosure" class="section">
+        <section class="block">
+            <div class="wrap">
+                <div class="sec-head">
+                    <span class="kicker">Disclosure</span>
+                    <h2>📋 공시</h2>
+                    <p>회사 관련 공시 자료를 확인하실 수 있습니다.</p>
+                </div>
+                <div class="board-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="col-no">번호</th>
+                                <th class="col-title">제목</th>
+                                <th class="col-date">등록일</th>
+                                <th class="col-file">첨부파일</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="col-no">1</td>
+                                <td class="col-title">설립공고</td>
+                                <td class="col-date">2026.01.19</td>
+                                <td class="col-file">
+                                    <a href="./pdf/설립공고.pdf" class="file-link" target="_blank" rel="noopener">📎 PDF</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section id="contact" class="section">
+        <section class="block">
+            <div class="wrap">
+                <div class="contact-grid">
+                    <div class="contact-info reveal">
+                        <span class="kicker" style="color:var(--accent);font-weight:700;font-size:0.82rem;letter-spacing:0.04em;text-transform:uppercase;">Contact</span>
+                        <h2>문의하기</h2>
+                        <p>협업 제안, 서비스 도입, 채용, 그 밖의 궁금한 점을 남겨주세요. 확인 후 빠르게 답변드리겠습니다.</p>
+                        <div class="contact-detail"><span class="ci">✉️</span><a href="mailto:trobai@trobai.com">trobai@trobai.com</a></div>
+                        <div class="contact-detail"><span class="ci">📞</span><span>010-9974-1007</span></div>
+                        <div class="contact-detail"><span class="ci">📍</span><span>서울특별시 강북구 노해로23길 123, 5층 505호</span></div>
+                    </div>
+
+                    <div class="form-card reveal">
+                        <form id="contactForm" onsubmit="submitContact(event)">
+                            <div class="field">
+                                <label for="cf-subject">제목</label>
+                                <input type="text" id="cf-subject" name="subject" required maxlength="120" placeholder="문의 제목을 입력해주세요">
+                            </div>
+                            <div class="field">
+                                <label for="cf-message">내용</label>
+                                <textarea id="cf-message" name="message" required maxlength="3000" placeholder="문의 내용을 자세히 적어주세요"></textarea>
+                            </div>
+                            <!-- 스팸 방지용 허니팟 (사람에게는 안 보임) -->
+                            <input type="text" class="hp-field" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true">
+                            <button type="submit" class="btn btn-primary submit-btn">보내기</button>
+                            <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <!-- ============ Footer ============ -->
     <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-logo">Trobai</div>
-            <div class="footer-contact">
-                <a href="mailto:trobai@trobai.com">trobai@trobai.com</a>
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <div class="fb-logo">
+                        <div class="logo-mark">T</div>
+                        <span class="logo-text">Trobai</span>
+                    </div>
+                    <p>AI 기술로 일상을 더 편리하게 만드는 서비스를 개발하는 스타트업입니다.</p>
+                </div>
+                <div class="footer-info">
+                    <div class="row"><span class="k">회사명</span><span class="v">Trobai</span></div>
+                    <div class="row"><span class="k">대표이사</span><span class="v">조혜리</span></div>
+                    <div class="row"><span class="k">전화</span><span class="v"><a href="tel:01099741007">010-9974-1007</a></span></div>
+                    <div class="row"><span class="k">이메일</span><span class="v"><a href="mailto:trobai@trobai.com">trobai@trobai.com</a></span></div>
+                    <div class="row"><span class="k">주소</span><span class="v">서울특별시 강북구 노해로23길 123, 5층 505호<br>(수유동, 강북청년창업마루)</span></div>
+                </div>
             </div>
-            <div class="footer-copyright">
-                © 2026 Trobai. All rights reserved.
-            </div>
+            <div class="footer-bottom">© 2026 Trobai. All rights reserved.</div>
         </div>
     </footer>
 
     <script>
-        function showTab(tabName) {
-            // 모든 탭 컨텐츠 숨기기
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
+        /* ---------- 섹션 전환 ---------- */
+        const NAV_OF = { home: null, airnotte: 'services', disclosure: 'disclosure', contact: 'contact' };
+
+        function switchSection(id, navKey, anchorId, fromPop) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            const sec = document.getElementById(id);
+            if (sec) sec.classList.add('active');
+
+            document.querySelectorAll('[data-nav]').forEach(n => {
+                n.classList.remove('active');
+                n.removeAttribute('aria-current');
             });
+            if (navKey) {
+                document.querySelectorAll('[data-nav="' + navKey + '"]').forEach(n => {
+                    n.classList.add('active');
+                    n.setAttribute('aria-current', 'page');
+                });
+            }
 
-            // 모든 탭 버튼 비활성화
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
+            closeDropdown();
+            closeMenu();
+
+            // 브라우저 뒤로가기 지원: 직접 클릭으로 이동할 때만 히스토리에 기록
+            if (!fromPop) {
+                history.pushState({ id: id, navKey: navKey || null, anchorId: anchorId || null }, '', '#' + id);
+            }
+
+            if (anchorId) {
+                requestAnimationFrame(() => {
+                    document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            revealCheck();
+        }
+
+        /* 뒤로/앞으로 가기 */
+        window.addEventListener('popstate', (e) => {
+            const st = e.state;
+            if (st && st.id) {
+                switchSection(st.id, st.navKey, st.anchorId, true);
+            } else {
+                const hid = (location.hash || '#home').slice(1);
+                const id = document.getElementById(hid) ? hid : 'home';
+                switchSection(id, NAV_OF[id] ?? null, null, true);
+            }
+        });
+
+        /* 첫 진입 시 주소(#섹션) 복원 + 기준 히스토리 설정 */
+        (function initFromHash() {
+            const hid = (location.hash || '').slice(1);
+            if (hid && document.getElementById(hid) && hid !== 'home') {
+                switchSection(hid, NAV_OF[hid] ?? null, null, true);
+                history.replaceState({ id: hid, navKey: NAV_OF[hid] ?? null, anchorId: null }, '', '#' + hid);
+            } else {
+                history.replaceState({ id: 'home', navKey: null, anchorId: null }, '', '#home');
+            }
+        })();
+
+        /* ---------- 서비스 드롭다운 ---------- */
+        const servicesBtn = document.getElementById('servicesBtn');
+        const servicesMenu = document.getElementById('servicesMenu');
+        function toggleDropdown(e) {
+            if (e) e.stopPropagation();
+            const open = servicesMenu.classList.toggle('open');
+            servicesBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+        function closeDropdown() {
+            if (!servicesMenu) return;
+            servicesMenu.classList.remove('open');
+            servicesBtn.setAttribute('aria-expanded', 'false');
+        }
+        document.addEventListener('click', e => { if (!e.target.closest('.dropdown')) closeDropdown(); });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') { closeDropdown(); closeMenu(); }
+        });
+
+        /* ---------- 모바일 메뉴 ---------- */
+        const navMenu = document.getElementById('navMenu');
+        const hamburger = document.querySelector('.hamburger');
+        function toggleMenu() {
+            const open = navMenu.classList.toggle('open');
+            hamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+        function closeMenu() {
+            navMenu.classList.remove('open');
+            hamburger?.setAttribute('aria-expanded', 'false');
+        }
+
+        /* 로고 키보드 접근 */
+        document.querySelector('.logo')?.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); switchSection('home', null); }
+        });
+
+        /* ---------- 스크롤 등장 애니메이션 ---------- */
+        const io = ('IntersectionObserver' in window)
+            ? new IntersectionObserver((entries) => {
+                entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in-view'); io.unobserve(en.target); } });
+              }, { threshold: 0.12 })
+            : null;
+        function revealCheck() {
+            document.querySelectorAll('.reveal:not(.in-view)').forEach(el => {
+                if (!io) { el.classList.add('in-view'); return; }
+                const r = el.getBoundingClientRect();
+                if (r.top < window.innerHeight * 0.92) el.classList.add('in-view');
+                else io.observe(el);
             });
+        }
+        revealCheck();
 
-            // 선택된 탭 컨텐츠 표시
-            document.getElementById(tabName + '-tab').classList.add('active');
+        /* ---------- 문의 폼 전송 (Vercel 서버리스 /api/contact 경유) ---------- */
+        async function submitContact(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = form.querySelector('.submit-btn');
+            const statusEl = document.getElementById('formStatus');
+            statusEl.className = 'form-status';
+            statusEl.textContent = '';
+            btn.disabled = true;
+            const orig = btn.textContent;
+            btn.textContent = '전송 중...';
 
-            // 선택된 탭 버튼 활성화
-            event.target.classList.add('active');
+            try {
+                const res = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        subject: form.subject.value.trim(),
+                        message: form.message.value.trim(),
+                        botcheck: form.botcheck.value
+                    })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (res.ok && data.success) {
+                    statusEl.className = 'form-status success';
+                    statusEl.textContent = '✅ 문의가 정상적으로 전송되었습니다. 빠르게 답변드리겠습니다.';
+                    form.reset();
+                } else {
+                    statusEl.className = 'form-status error';
+                    statusEl.textContent = '⚠️ ' + (data.message || '전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+                }
+            } catch (err) {
+                statusEl.className = 'form-status error';
+                statusEl.textContent = '⚠️ 네트워크 오류로 전송하지 못했습니다. trobai@trobai.com 으로 보내주세요.';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = orig;
+            }
         }
     </script>
 </body>

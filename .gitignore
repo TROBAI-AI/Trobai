@@ -1,0 +1,14 @@
+# 보안: 환경변수/키 파일 절대 커밋 금지
+.env
+.env.*
+!.env.example
+
+# Vercel
+.vercel
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
