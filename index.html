@@ -3,601 +3,748 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trobai · AI로 일상을 바꾸는 서비스를 만듭니다</title>
-    <meta name="description" content="Trobai는 AI 기반 서비스를 개발하는 스타트업입니다. 첫 번째 서비스 AirNotte는 대화형 AI 여행 플래너입니다.">
+    <title>Trobai · Neural-Symbolic AI Tech Studio</title>
+    <meta name="description" content="Trobai는 KAIST 박사 연구진이 설립한 AI 딥테크 스튜디오입니다. Neuro-Symbolic AI 기술로 여행의 지능 레이어를 만듭니다. 첫 결과물 AirNotte.">
     <link rel="icon" type="image/png" href="./img/logo.png">
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+    <script>
+    tailwind.config = { theme: { extend: {
+      colors: { ink:'#0B0E14', paper:'#FAFAF8', blue:'#1E40FF', orange:'#FF5A1F', hair:'#E6E6E1' },
+      fontFamily: {
+        display:['"Space Grotesk"','Pretendard','system-ui','sans-serif'],
+        sans:['Pretendard','system-ui','sans-serif'],
+        mono:['"Space Grotesk"','ui-monospace','monospace']
+      }
+    }}};
+    </script>
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        :root {
-            --bg: #ffffff;
-            --bg-soft: #f7f9fb;
-            --bg-softer: #fbfcfe;
-            --text: #161b26;
-            --text-soft: #5b6573;
-            --text-faint: #8a93a2;
-            --border: #e9edf2;
-            --border-strong: #dde3ea;
-            /* Trobai 회사 브랜드 = 하늘색 계열 (포인트 컬러로만 사용) */
-            --accent: #2c6fb5;
-            --accent-2: #7eb8da;
-            --accent-soft: #eaf3fb;
-            --shadow-sm: 0 1px 2px rgba(22, 27, 38, 0.04), 0 2px 8px rgba(22, 27, 38, 0.04);
-            --shadow-md: 0 4px 24px rgba(22, 27, 38, 0.07);
-            --radius: 16px;
-            --radius-lg: 22px;
-            --maxw: 1400px;
-        }
-
-        html { scroll-behavior: smooth; }
-
-        body {
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            color: var(--text);
-            background: var(--bg);
-            line-height: 1.65;
-            -webkit-font-smoothing: antialiased;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        a { color: inherit; text-decoration: none; }
-
-        /* ---------- Header ---------- */
-        .header {
-            position: sticky; top: 0; z-index: 100;
-            background: rgba(255, 255, 255, 0.82);
-            backdrop-filter: saturate(180%) blur(14px);
-            border-bottom: 1px solid var(--border);
-        }
-        .header-inner {
-            max-width: var(--maxw); margin: 0 auto;
-            padding: 0.85rem 1.5rem;
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 1rem;
-        }
-        .logo { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; }
-        .logo-mark {
-            width: 34px; height: 34px; border-radius: 9px;
-            background: linear-gradient(135deg, #2c6fb5 0%, #7eb8da 100%);
-            display: flex; align-items: center; justify-content: center;
-            color: #fff; font-size: 1.05rem; font-weight: 800;
-            box-shadow: 0 2px 8px rgba(44, 111, 181, 0.28);
-        }
-        .logo-img { height: 32px; width: auto; display: block; }
-        .logo-text { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text); }
-
-        /* Nav */
-        .nav { display: flex; align-items: center; gap: 0.25rem; }
-        .nav-link {
-            position: relative;
-            padding: 0.5rem 0.9rem; border-radius: 9px;
-            font-size: 0.94rem; font-weight: 600; color: var(--text-soft);
-            background: none; border: none; cursor: pointer; font-family: inherit;
-            transition: color .18s, background .18s;
-            display: inline-flex; align-items: center; gap: 0.3rem;
-        }
-        .nav-link:hover { color: var(--text); background: var(--bg-soft); }
-        .nav-link.active { color: var(--accent); }
-        .nav-link .caret { font-size: 0.65rem; transition: transform .2s; opacity: .7; }
-
-        /* Dropdown */
-        .dropdown { position: relative; }
-        .dropdown-menu {
-            position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(6px);
-            min-width: 268px;
-            background: #fff; border: 1px solid var(--border); border-radius: 14px;
-            box-shadow: var(--shadow-md);
-            padding: 0.5rem; opacity: 0; visibility: hidden; transition: opacity .18s, transform .18s;
-            z-index: 120;
-        }
-        .dropdown-menu.open { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
-        @media (hover: hover) {
-            .dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
-            .dropdown:hover .caret { transform: rotate(180deg); }
-        }
-        .dropdown-menu.open ~ * .caret { transform: rotate(180deg); }
-        .service-item {
-            display: flex; align-items: center; gap: 0.75rem;
-            padding: 0.7rem 0.75rem; border-radius: 10px; cursor: pointer;
-            transition: background .15s;
-        }
-        .service-item:hover { background: var(--bg-soft); }
-        .service-item.is-soon { cursor: not-allowed; opacity: 0.72; }
-        .service-item.is-soon:hover { background: none; }
-        .service-ico {
-            width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center; font-size: 1.15rem;
-        }
-        .service-ico.air { background: linear-gradient(135deg, #fb923c, #f97316); color: #fff; }
-        .service-ico.soon { background: var(--bg-soft); color: var(--text-faint); border: 1px solid var(--border); }
-        .service-meta { display: flex; flex-direction: column; line-height: 1.3; }
-        .service-name { font-weight: 700; font-size: 0.95rem; color: var(--text); }
-        .service-desc { font-size: 0.8rem; color: var(--text-faint); }
-        .badge-soon {
-            margin-left: auto; font-size: 0.68rem; font-weight: 700; color: var(--text-faint);
-            background: var(--bg-soft); border: 1px solid var(--border); border-radius: 999px;
-            padding: 0.1rem 0.5rem;
-        }
-
-        .hamburger {
-            display: none; background: none; border: none; cursor: pointer;
-            width: 40px; height: 40px; border-radius: 9px; font-size: 1.3rem; color: var(--text);
-        }
-        .hamburger:hover { background: var(--bg-soft); }
-
-        /* ---------- Sections ---------- */
         .section { display: none; }
-        .section.active { display: block; animation: fade .35s ease; }
-        @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+        .section.active { display: block; }
 
-        .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 1.5rem; }
+        .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+        .reveal.in-view { opacity: 1; transform: translateY(0); }
 
-        /* Hero */
-        .hero {
-            text-align: center; padding: 5.5rem 1.5rem 4rem;
-            background:
-              radial-gradient(900px 360px at 50% -10%, var(--accent-soft) 0%, rgba(234,243,251,0) 70%),
-              var(--bg);
-        }
-        .eyebrow {
-            display: inline-block; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.02em;
-            color: var(--accent); background: var(--accent-soft);
-            padding: 0.35rem 0.85rem; border-radius: 999px; margin-bottom: 1.25rem;
-        }
-        .hero h1 {
-            font-size: clamp(2rem, 5vw, 3.1rem); font-weight: 800; letter-spacing: -0.03em;
-            line-height: 1.18; color: var(--text); margin-bottom: 1.1rem;
-        }
-        .hero h1 .grad {
-            background: linear-gradient(120deg, #2c6fb5, #7eb8da);
-            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .hero p.lead {
-            font-size: clamp(1rem, 2vw, 1.18rem); color: var(--text-soft);
-            max-width: 640px; margin: 0 auto 2rem;
-        }
-        .cta-row { display: flex; gap: 0.7rem; justify-content: center; flex-wrap: wrap; }
-        .btn {
-            display: inline-flex; align-items: center; gap: 0.45rem;
-            padding: 0.8rem 1.5rem; border-radius: 11px; font-weight: 700; font-size: 0.98rem;
-            cursor: pointer; border: 1px solid transparent; font-family: inherit; transition: transform .15s, box-shadow .15s, background .15s;
-        }
-        .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 6px 18px rgba(44, 111, 181, 0.26); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(44, 111, 181, 0.32); }
-        .btn-ghost { background: #fff; color: var(--text); border-color: var(--border-strong); }
-        .btn-ghost:hover { background: var(--bg-soft); transform: translateY(-2px); }
-
-        /* Section heading */
-        .sec-head { text-align: center; max-width: 680px; margin: 0 auto 2.75rem; }
-        .sec-head .kicker { font-size: 0.82rem; font-weight: 700; color: var(--accent); letter-spacing: 0.04em; text-transform: uppercase; }
-        .sec-head h2 { font-size: clamp(1.6rem, 3.5vw, 2.2rem); font-weight: 800; letter-spacing: -0.02em; margin: 0.5rem 0 0.7rem; }
-        .sec-head p { color: var(--text-soft); font-size: 1.02rem; }
-
-        .block { padding: 4.5rem 0; }
-        .block.alt { background: var(--bg-soft); }
-
-        /* Service cards (home) */
-        .svc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
-        .svc-card {
-            background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
-            padding: 1.9rem; box-shadow: var(--shadow-sm); transition: transform .2s, box-shadow .2s, border-color .2s;
-            display: flex; flex-direction: column;
-        }
-        .svc-card.live { cursor: pointer; }
-        .svc-card.live:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--border-strong); }
-        .svc-card .svc-top { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.1rem; }
-        .svc-logo { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
-        .svc-logo.air { background: linear-gradient(135deg, #fb923c, #f97316); color: #fff; box-shadow: 0 4px 12px rgba(249,115,22,.3); }
-        .svc-logo.ph { background: var(--bg-soft); border: 1px dashed var(--border-strong); color: var(--text-faint); }
-        .svc-card h3 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; }
-        .svc-card .tag { font-size: 0.78rem; color: var(--text-faint); font-weight: 600; }
-        .svc-card p { color: var(--text-soft); font-size: 0.95rem; margin-bottom: 1.25rem; flex: 1; }
-        .svc-link { font-weight: 700; color: var(--accent); font-size: 0.92rem; display: inline-flex; align-items: center; gap: 0.3rem; }
-        .svc-link .arrow { transition: transform .2s; }
-        .svc-card.live:hover .arrow { transform: translateX(4px); }
-        .svc-soon-label { font-weight: 700; color: var(--text-faint); font-size: 0.9rem; }
-
-        /* Vision / info cards */
-        .vision-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; }
-        .vcard { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.7rem; box-shadow: var(--shadow-sm); }
-        .vcard .vico { font-size: 1.5rem; margin-bottom: 0.7rem; }
-        .tech-ico { width: 46px; height: 46px; border-radius: 12px; background: #fff3e9; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; margin-bottom: 0.8rem; }
-
-        /* NSAi equation (Neural + Symbolic = NSAi) */
-        .nsai-eq { display: flex; align-items: center; justify-content: center; gap: 0.4rem; flex-wrap: wrap; max-width: 960px; margin: 0 auto; }
-        .eq-card { flex: 1 1 240px; max-width: 300px; background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem 1.3rem; text-align: center; box-shadow: var(--shadow-sm); }
-        .eq-card.accent { border-color: var(--accent-2); background: var(--accent-soft); }
-        .eq-card .eq-label { font-size: 0.72rem; font-weight: 800; color: var(--text-faint); letter-spacing: 0.06em; }
-        .eq-card.accent .eq-label { color: var(--accent); }
-        .eq-card h4 { font-size: 1.1rem; font-weight: 700; margin: 0.35rem 0 0.4rem; }
-        .eq-card p { font-size: 0.86rem; color: var(--text-soft); line-height: 1.55; }
-        .eq-op { font-size: 1.7rem; font-weight: 800; color: var(--text-faint); padding: 0 0.4rem; flex: 0 0 auto; }
-
-        /* Pipeline 4 steps */
-        .pipeline { display: flex; align-items: stretch; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin-top: 2.75rem; }
-        .pipe-step { flex: 1 1 190px; max-width: 260px; background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 1.3rem; box-shadow: var(--shadow-sm); }
-        .pipe-num { width: 30px; height: 30px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; margin-bottom: 0.7rem; }
-        .pipe-step h4 { font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; }
-        .pipe-step p { font-size: 0.85rem; color: var(--text-soft); line-height: 1.5; }
-
-        /* Trust badges — 균형 잡힌 카드 그리드 */
-        .badge-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 2.75rem; }
-        .badge-card {
-            background: #fff; border: 1px solid var(--border); border-radius: 16px;
-            padding: 1.6rem 1.1rem; text-align: center;
-            display: flex; flex-direction: column; align-items: center; gap: 0.55rem;
-            box-shadow: var(--shadow-sm); transition: transform .2s, box-shadow .2s, border-color .2s;
-        }
-        .badge-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--border-strong); }
-        .badge-card .bc-ico { width: 54px; height: 54px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; }
-        .badge-card .bc-ico.gold { background: #fff7e6; }
-        .badge-card .bc-ico.blue { background: var(--accent-soft); }
-        .badge-card .bc-title { font-weight: 700; font-size: 0.98rem; line-height: 1.45; color: var(--text); }
-        .badge-card .bc-title strong { color: var(--accent); font-weight: 800; }
-        .badge-card .bc-sub { font-size: 0.8rem; color: var(--text-faint); line-height: 1.4; }
-        @media (max-width: 900px) { .badge-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 520px) { .badge-grid { grid-template-columns: 1fr; } }
-        .vcard h4 { font-size: 1.06rem; font-weight: 700; margin-bottom: 0.4rem; }
-        .vcard p { color: var(--text-soft); font-size: 0.92rem; }
-
-        /* Timeline (회사연혁) */
-        .timeline { max-width: 520px; margin: 0 auto; position: relative; padding-left: 1.5rem; }
-        .timeline::before { content: ''; position: absolute; left: 6px; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(var(--accent-2), var(--border)); }
-        .tl-item { position: relative; padding: 0 0 1.8rem 1.6rem; }
-        .tl-item::before { content: ''; position: absolute; left: -1.5rem; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); border: 3px solid #fff; box-shadow: 0 0 0 2px var(--accent-2); }
-        .tl-item:last-child { padding-bottom: 0; }
-        .tl-date { font-weight: 800; color: var(--accent); font-size: 0.95rem; }
-        .tl-title { font-weight: 700; margin-top: 0.15rem; }
-        .tl-desc { color: var(--text-soft); font-size: 0.92rem; }
-        .tl-item.future::before { background: #fff; box-shadow: 0 0 0 2px var(--border-strong); }
-        .tl-item.future .tl-date { color: var(--text-faint); }
-
-        /* About page */
-        .about-intro { max-width: 780px; margin: 0 auto 2.75rem; text-align: center; }
-        .about-intro p { color: var(--text-soft); font-size: 1.08rem; line-height: 1.85; margin-bottom: 1rem; }
-        .about-intro p:last-child { margin-bottom: 0; }
-        .about-intro strong { color: var(--text); }
-        .info-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; max-width: 920px; margin: 0 auto; }
-        .info-cell { background: #fff; padding: 1.3rem 1.5rem; display: flex; flex-direction: column; gap: 0.35rem; }
-        .info-cell .info-k { font-size: 0.8rem; color: var(--text-faint); font-weight: 600; }
-        .info-cell .info-v { font-size: 1.02rem; font-weight: 600; color: var(--text); }
-        @media (max-width: 720px) { .info-cards { grid-template-columns: 1fr; } }
-
-        /* ---------- AirNotte product section (orange theme) ---------- */
-        #airnotte { --accent: #f97316; --accent-2: #fb923c; --accent-soft: #fff3e9; }
-        .air-hero {
-            text-align: center; padding: 5rem 1.5rem 3.5rem;
-            background: radial-gradient(900px 380px at 50% -10%, #fff3e9 0%, rgba(255,243,233,0) 72%), var(--bg);
-        }
-        .air-logo-row { display: inline-flex; align-items: center; gap: 0.7rem; margin-bottom: 1.2rem; }
-        .air-logo {
-            width: 52px; height: 52px; border-radius: 14px;
-            background: linear-gradient(135deg, #fb923c, #f97316); color: #fff;
-            display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 800;
-            box-shadow: 0 6px 18px rgba(249,115,22,.35);
-        }
-        .air-logo-name { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
-        .air-hero h1 { font-size: clamp(1.9rem, 4.5vw, 2.9rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 1rem; }
-        .air-hero h1 .grad { background: linear-gradient(120deg, #fb923c, #f97316); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-        .air-hero p { color: var(--text-soft); font-size: 1.1rem; max-width: 600px; margin: 0 auto 2rem; }
-        .btn-air { background: #f97316; color: #fff; box-shadow: 0 6px 18px rgba(249,115,22,.3); }
-        .btn-air:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(249,115,22,.38); }
-
-        .air-stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 2.5rem; margin-top: 2.5rem; }
-        .air-stat .num { font-size: 1.9rem; font-weight: 800; color: #f97316; }
-        .air-stat .lbl { font-size: 0.85rem; color: var(--text-soft); }
-
-        /* App screenshot frame */
-        .app-frame {
-            border-radius: 16px; overflow: hidden; border: 1px solid var(--border);
-            box-shadow: var(--shadow-md); background: #fff; line-height: 0;
-        }
-        .app-frame img { width: 100%; height: auto; display: block; }
-
-        /* Feature rows */
-        .feature-row {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;
-            padding: 3.25rem 0; border-bottom: 1px solid var(--border);
-        }
-        .feature-row:last-child { border-bottom: none; }
-        .feature-row.flip .feature-text { order: 2; }
-        .feature-row.flip .feature-media { order: 1; }
-        .feature-step {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 30px; height: 30px; border-radius: 9px; background: #fff3e9; color: #f97316;
-            font-weight: 800; font-size: 0.9rem; margin-bottom: 0.9rem;
-        }
-        .feature-text h3 { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.7rem; }
-        .feature-text p { color: var(--text-soft); font-size: 1rem; }
-        .feature-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
-        .feature-tags span { font-size: 0.82rem; font-weight: 600; color: #c2410c; background: #fff3e9; border-radius: 999px; padding: 0.3rem 0.75rem; }
-
-        .air-cta { text-align: center; padding: 4rem 1.5rem; }
-
-        /* ---------- Disclosure board (기존 구조 유지) ---------- */
-        .board-table {
-            background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
-            overflow: hidden; box-shadow: var(--shadow-sm);
-        }
-        .board-table table { width: 100%; border-collapse: collapse; }
-        .board-table th {
-            background: var(--bg-soft); padding: 1rem 1.5rem; text-align: left;
-            font-weight: 700; color: var(--text); font-size: 0.9rem; border-bottom: 1px solid var(--border); white-space: nowrap;
-        }
-        .board-table td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); color: var(--text-soft); font-size: 0.92rem; }
-        .board-table tr:last-child td { border-bottom: none; }
-        .board-table tbody tr:hover td { background: var(--bg-softer); }
-        .board-table .col-no { width: 70px; text-align: center; }
-        .board-table .col-date { width: 120px; text-align: center; }
-        .board-table .col-file { width: 110px; text-align: center; }
-        .board-table .col-title { color: var(--text); font-weight: 600; }
-        .file-link { display: inline-flex; align-items: center; gap: 0.35rem; color: var(--accent); font-weight: 600; }
-        .file-link:hover { text-decoration: underline; }
-
-        /* ---------- Contact form ---------- */
-        .contact-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 3rem; align-items: start; }
-        .contact-info h2 { font-size: clamp(1.6rem, 3.5vw, 2.1rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.8rem; }
-        .contact-info p { color: var(--text-soft); margin-bottom: 1.6rem; }
-        .contact-detail { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.9rem; color: var(--text-soft); font-size: 0.95rem; }
-        .contact-detail .ci { width: 34px; height: 34px; border-radius: 9px; background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .contact-detail a:hover { color: var(--accent); }
-
-        .form-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-md); }
-        .field { margin-bottom: 1.1rem; }
-        .field label { display: block; font-size: 0.88rem; font-weight: 700; margin-bottom: 0.4rem; }
-        .field input, .field textarea {
-            width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--border-strong); border-radius: 11px;
-            font-family: inherit; font-size: 0.96rem; color: var(--text); background: var(--bg-softer); transition: border-color .15s, box-shadow .15s;
-        }
-        .field input:focus, .field textarea:focus { outline: none; border-color: var(--accent-2); box-shadow: 0 0 0 3px var(--accent-soft); background: #fff; }
-        .field textarea { resize: vertical; min-height: 150px; }
-        .hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
-        .submit-btn { width: 100%; justify-content: center; }
-        .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
-        .form-status { margin-top: 1rem; font-size: 0.92rem; font-weight: 600; min-height: 1.2rem; }
-        .form-status.success { color: #15803d; }
-        .form-status.error { color: #dc2626; }
-
-        /* ---------- Footer ---------- */
-        .footer { background: #11161f; color: #c4ccd6; margin-top: auto; padding: 3rem 1.5rem 2rem; }
-        .footer-inner { max-width: var(--maxw); margin: 0 auto; }
-        .footer-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2rem; padding-bottom: 2rem; border-bottom: 1px solid #232a36; }
-        .footer-brand .fb-logo { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.8rem; }
-        .footer-brand .logo-text { color: #fff; }
-        .footer-brand p { font-size: 0.9rem; color: #8a93a2; max-width: 320px; }
-        .footer-info { display: grid; gap: 0.5rem; font-size: 0.9rem; }
-        .footer-info .row { display: flex; gap: 0.6rem; }
-        .footer-info .k { color: #6b7585; min-width: 64px; }
-        .footer-info .v { color: #c4ccd6; }
-        .footer-info a:hover { color: #fff; }
-        .footer-bottom { padding-top: 1.5rem; font-size: 0.82rem; color: #6b7585; text-align: center; }
-
-        /* Reveal animation */
-        .reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s ease; }
-        .reveal.in-view { opacity: 1; transform: none; }
         @media (prefers-reduced-motion: reduce) {
-            html { scroll-behavior: auto; }
-            .reveal { opacity: 1; transform: none; transition: none; }
-            .section.active { animation: none; }
+          .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+          html { scroll-behavior: auto; }
+          * { animation: none !important; }
         }
 
-        /* ---------- Responsive ---------- */
-        @media (max-width: 860px) {
-            .feature-row { grid-template-columns: 1fr; gap: 1.5rem; padding: 2.5rem 0; }
-            .feature-row.flip .feature-text { order: 0; }
-            .feature-row.flip .feature-media { order: 0; }
-            .contact-grid { grid-template-columns: 1fr; gap: 2rem; }
+        body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+
+        .hair { border-color: #E6E6E1; }
+
+        /* Static node glow for the dark NSAi diagram — no pulse */
+        .node-glow {
+          box-shadow: 0 0 0 1px rgba(30,64,255,0.45), 0 0 26px -6px rgba(30,64,255,0.55);
         }
-        @media (max-width: 720px) {
-            .hamburger { display: flex; align-items: center; justify-content: center; }
-            .nav {
-                position: absolute; top: 100%; left: 0; right: 0;
-                flex-direction: column; align-items: stretch; gap: 0.2rem;
-                background: #fff; border-bottom: 1px solid var(--border);
-                padding: 0.6rem; box-shadow: var(--shadow-md);
-                display: none;
-            }
-            .nav.open { display: flex; }
-            .nav-link { justify-content: space-between; padding: 0.8rem 1rem; }
-            .dropdown { width: 100%; }
-            .dropdown-menu {
-                position: static; transform: none; opacity: 1; visibility: visible;
-                box-shadow: none; border: none; min-width: 0; padding: 0.2rem 0 0.2rem 0.5rem;
-                display: none;
-            }
-            .dropdown-menu.open { display: block; transform: none; }
-            @media (hover: hover) { .dropdown:hover .dropdown-menu { display: none; } .dropdown-menu.open { display: block; } }
-            .air-stats { gap: 1.6rem; }
+        .node-glow-orange {
+          box-shadow: 0 0 0 1px rgba(255,90,31,0.45), 0 0 26px -6px rgba(255,90,31,0.55);
+        }
+
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #FAFAF8; }
+        ::-webkit-scrollbar-thumb { background: #d8d8d2; }
+        ::-webkit-scrollbar-thumb:hover { background: #bfbfb8; }
+        ::selection { background: #1E40FF; color: #fff; }
+
+        /* Print: only the open notice document, black-on-white, no chrome */
+        @media print {
+          header, footer, .no-print, #disclosure-list, .section:not(.active) { display: none !important; }
+          #disclosure.section { display: block !important; }
+          #disclosure-detail { display: block !important; }
+          body { background: #fff !important; }
+          #disclosure-detail, #disclosure-detail * { color: #000 !important; }
+          #disclosure-detail .disclosure-badge { border-color: #000 !important; background: transparent !important; }
         }
     </style>
 </head>
-<body>
-    <!-- ============ Header ============ -->
-    <header class="header">
-        <div class="header-inner">
-            <div class="logo" onclick="switchSection('home', null)" role="button" tabindex="0" aria-label="Trobai 홈">
-                <img src="./img/logo.png" class="logo-img" alt="Trobai">
-                <span class="logo-text">Trobai</span>
-            </div>
+<body class="bg-paper text-ink font-sans antialiased">
 
-            <button class="hamburger" aria-label="메뉴 열기" aria-expanded="false" onclick="toggleMenu()">☰</button>
+    <!-- ============ NAV ============ -->
+    <header class="fixed top-0 inset-x-0 z-50 bg-paper/80 backdrop-blur-md border-b hair">
+        <div class="max-w-[88rem] mx-auto px-6 h-16 flex items-center justify-between">
+            <button class="flex items-baseline gap-2 group" onclick="switchSection('home','home')" aria-label="Trobai 홈">
+                <span class="font-display text-2xl font-bold tracking-tight text-ink">Trobai</span>
+                <span class="hidden sm:inline font-mono text-[10px] tracking-[0.2em] text-ink/40 translate-y-[-1px]">NSAi STUDIO</span>
+            </button>
 
-            <nav class="nav" id="navMenu" aria-label="주요 메뉴">
-                <button class="nav-link" data-nav="about" onclick="switchSection('about','about')">회사소개</button>
-
-                <div class="dropdown">
-                    <button class="nav-link" id="servicesBtn" data-nav="services"
-                            aria-haspopup="true" aria-expanded="false" aria-controls="servicesMenu"
-                            onclick="toggleDropdown(event)">
-                        서비스 <span class="caret">▾</span>
+            <nav class="hidden md:flex items-center gap-9 text-sm font-medium text-ink/70">
+                <button class="hover:text-ink transition-colors" onclick="switchSection('about','about')">회사소개</button>
+                <div class="relative group">
+                    <button class="flex items-center gap-1 hover:text-ink transition-colors" aria-haspopup="true">
+                        서비스 <i data-lucide="chevron-down" class="w-4 h-4"></i>
                     </button>
-                    <ul class="dropdown-menu" id="servicesMenu" role="menu" aria-label="서비스 목록">
-                        <!-- 라이브 서비스 -->
-                        <li class="service-item" role="menuitem" tabindex="0"
-                            onclick="switchSection('airnotte','services')"
-                            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();switchSection('airnotte','services');}">
-                            <span class="service-ico air">✈️</span>
-                            <span class="service-meta">
-                                <span class="service-name">AirNotte</span>
-                                <span class="service-desc">AI 맞춤 여행 플래너</span>
-                            </span>
-                        </li>
-                        <!-- 준비중 서비스 (추가 시 이 블록을 복사해서 이름만 바꾸세요) -->
-                        <li class="service-item is-soon" role="menuitem" aria-disabled="true">
-                            <span class="service-ico soon">✦</span>
-                            <span class="service-meta">
-                                <span class="service-name">새로운 서비스</span>
-                                <span class="service-desc">준비 중입니다</span>
-                            </span>
-                            <span class="badge-soon">준비중</span>
-                        </li>
-                    </ul>
+                    <div class="absolute top-full -left-4 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-150">
+                        <div class="bg-paper border hair shadow-xl p-2 w-56">
+                            <button onclick="switchSection('airnotte','services')" class="flex items-center gap-3 w-full p-3 hover:bg-ink/[0.04] transition-colors text-left">
+                                <span class="w-8 h-8 bg-ink flex items-center justify-center text-paper shrink-0">
+                                    <i data-lucide="navigation" class="w-4 h-4"></i>
+                                </span>
+                                <span>
+                                    <span class="block font-bold text-ink text-sm">AirNotte</span>
+                                    <span class="block font-mono text-[10px] tracking-wide text-ink/40">AI TRAVEL PLANNER</span>
+                                </span>
+                            </button>
+                            <div class="flex items-center gap-3 p-3 opacity-45 cursor-default">
+                                <span class="w-8 h-8 bg-ink/10 flex items-center justify-center text-ink shrink-0">
+                                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                                </span>
+                                <span>
+                                    <span class="block font-bold text-ink text-sm">다음 제품</span>
+                                    <span class="block font-mono text-[10px] tracking-wide text-ink/40">준비중</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                <button class="nav-link" data-nav="disclosure" onclick="switchSection('disclosure','disclosure')">공시</button>
-                <button class="nav-link" data-nav="contact" onclick="switchSection('contact','contact')">문의하기</button>
+                <button class="hover:text-ink transition-colors" onclick="switchSection('disclosure','disclosure')">공시</button>
+                <button class="bg-ink text-paper px-5 py-2 hover:bg-blue transition-colors font-mono text-[11px] tracking-[0.18em]" onclick="switchSection('contact','contact')">문의하기</button>
             </nav>
+
+            <button id="menuBtn" class="md:hidden text-ink" onclick="toggleMenu()" aria-label="메뉴 열기" aria-expanded="false" aria-controls="mobile-nav">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
         </div>
     </header>
 
-    <!-- ============ HOME ============ -->
-    <main id="home" class="section active">
-        <!-- Hero -->
-        <section class="hero">
-            <span class="eyebrow">AI Product Studio</span>
-            <h1>AI로 일상을 바꾸는<br><span class="grad">서비스를 만듭니다</span></h1>
-            <p class="lead">Trobai는 인공지능 기술로 사람들의 일상을 더 편리하게 만드는 서비스를 개발합니다. 그 첫 번째가 대화형 AI 여행 플래너 <strong>AirNotte</strong>입니다.</p>
-            <div class="cta-row">
-                <button class="btn btn-primary" onclick="switchSection('airnotte','services')">AirNotte 살펴보기 →</button>
-                <button class="btn btn-ghost" onclick="switchSection('contact','contact')">문의하기</button>
+    <!-- Mobile Nav -->
+    <div id="mobile-nav" class="fixed inset-0 z-40 bg-paper translate-x-full transition-transform duration-300 md:hidden">
+        <div class="p-8 pt-24 flex flex-col gap-2 text-2xl font-display font-bold tracking-tight">
+            <button class="py-3 text-left border-b hair" onclick="switchSection('home','home')">홈</button>
+            <button class="py-3 text-left border-b hair" onclick="switchSection('about','about')">회사소개</button>
+            <button class="py-3 text-left border-b hair" onclick="switchSection('airnotte','services')">AirNotte</button>
+            <button class="py-3 text-left border-b hair" onclick="switchSection('disclosure','disclosure')">공시</button>
+            <button class="py-3 text-left" onclick="switchSection('contact','contact')">문의하기</button>
+        </div>
+    </div>
+
+    <!-- ============ MAIN ============ -->
+    <main>
+
+        <!-- ============================================================= HOME -->
+        <section id="home" class="section active">
+
+            <!-- 1 · HERO — asymmetric 60/40 -->
+            <div class="max-w-[88rem] mx-auto px-6 pt-32 md:pt-40 pb-24">
+                <div class="grid lg:grid-cols-12 gap-12 lg:gap-8 items-end">
+                    <!-- Left 60 -->
+                    <div class="lg:col-span-7 reveal">
+                        <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-8 flex items-center gap-3">
+                            <span class="inline-block w-8 h-px bg-blue"></span>
+                            NEURAL · SYMBOLIC AI
+                        </div>
+                        <h1 class="font-display text-5xl sm:text-6xl md:text-7xl xl:text-8xl font-bold tracking-tight leading-[0.98]">
+                            여행의 지능<br>레이어를<br><span class="text-blue">만듭니다</span>
+                        </h1>
+                        <p class="mt-10 text-lg md:text-xl text-ink/65 leading-relaxed max-w-xl">
+                            KAIST 연구진이 만든 AI 딥테크 스튜디오 — 그 첫 번째 결과물, AirNotte.
+                        </p>
+                        <div class="mt-10 flex flex-wrap gap-3">
+                            <button onclick="switchSection('airnotte','services')" class="group px-7 py-4 bg-ink text-paper font-medium hover:bg-blue transition-colors flex items-center gap-2">
+                                AirNotte 보기 <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-0.5 transition-transform"></i>
+                            </button>
+                            <button onclick="switchSection('contact','contact')" class="px-7 py-4 border hair font-medium text-ink hover:bg-ink hover:text-paper transition-colors">
+                                문의하기
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right 40 — NSAi node diagram + screenshot peek -->
+                    <div class="lg:col-span-5 reveal" style="transition-delay:160ms;">
+                        <div class="relative border hair bg-white p-7 pb-0 overflow-hidden">
+                            <div class="font-mono text-[10px] tracking-[0.2em] text-ink/40 mb-6 flex items-center justify-between">
+                                <span>NSAi · PIPELINE</span>
+                                <span>v1</span>
+                            </div>
+                            <!-- pipeline nodes -->
+                            <div class="space-y-3 relative">
+                                <div class="flex items-center gap-3">
+                                    <span class="font-mono text-[10px] text-blue w-7 shrink-0">01</span>
+                                    <div class="flex-1 border hair px-4 py-3 bg-paper">
+                                        <div class="text-sm font-semibold text-ink">자연어</div>
+                                        <div class="font-mono text-[10px] text-ink/40 tracking-wide">NATURAL LANGUAGE</div>
+                                    </div>
+                                </div>
+                                <div class="pl-[1.15rem]"><div class="w-px h-3 bg-hair"></div></div>
+                                <div class="flex items-center gap-3">
+                                    <span class="font-mono text-[10px] text-blue w-7 shrink-0">02</span>
+                                    <div class="flex-1 border hair px-4 py-3 bg-paper">
+                                        <div class="text-sm font-semibold text-ink">조건 구조화</div>
+                                        <div class="font-mono text-[10px] text-ink/40 tracking-wide">CONSTRAINTS</div>
+                                    </div>
+                                </div>
+                                <div class="pl-[1.15rem]"><div class="w-px h-3 bg-hair"></div></div>
+                                <div class="flex items-center gap-3">
+                                    <span class="font-mono text-[10px] text-blue w-7 shrink-0">03</span>
+                                    <div class="flex-1 border hair px-4 py-3 bg-paper">
+                                        <div class="text-sm font-semibold text-ink">최적화</div>
+                                        <div class="font-mono text-[10px] text-ink/40 tracking-wide">OPTIMIZE</div>
+                                    </div>
+                                </div>
+                                <div class="pl-[1.15rem]"><div class="w-px h-3 bg-hair"></div></div>
+                                <div class="flex items-center gap-3">
+                                    <span class="font-mono text-[10px] text-blue w-7 shrink-0">04</span>
+                                    <div class="flex-1 border hair px-4 py-3 bg-paper">
+                                        <div class="text-sm font-semibold text-ink">검증</div>
+                                        <div class="font-mono text-[10px] text-ink/40 tracking-wide">VERIFY</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- screenshot peeking at lower edge -->
+                            <div class="mt-7 -mb-px border-t hair pt-6">
+                                <div class="border hair border-b-0 overflow-hidden shadow-[0_-10px_40px_-20px_rgba(11,14,20,0.4)]">
+                                    <img src="./img/airnotte-route.webp" width="1100" height="692" alt="AirNotte 동선 지도 미리보기" class="w-full block translate-y-2" decoding="async">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3 · CREDIBILITY STRIP -->
+            <div class="border-y hair bg-white">
+                <div class="max-w-[88rem] mx-auto px-6 py-8 grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-hair">
+                    <div class="flex items-start gap-3 px-2 py-4 lg:py-2">
+                        <i data-lucide="award" class="w-4 h-4 text-blue mt-0.5 shrink-0"></i>
+                        <div>
+                            <div class="text-sm font-semibold text-ink leading-snug">관광 오픈이노베이션 1등 선정</div>
+                            <div class="font-mono text-[10px] tracking-wide text-ink/40 mt-1">문체부 · 한국관광공사</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3 px-2 py-4 lg:py-2 lg:pl-8">
+                        <i data-lucide="medal" class="w-4 h-4 text-blue mt-0.5 shrink-0"></i>
+                        <div>
+                            <div class="text-sm font-semibold text-ink leading-snug">AI Champion</div>
+                            <div class="font-mono text-[10px] tracking-wide text-ink/40 mt-1">과기정통부</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3 px-2 py-4 lg:py-2 lg:pl-8">
+                        <i data-lucide="scroll-text" class="w-4 h-4 text-blue mt-0.5 shrink-0"></i>
+                        <div>
+                            <div class="text-sm font-semibold text-ink leading-snug">NSAi 특허 3건 출원</div>
+                            <div class="font-mono text-[10px] tracking-wide text-ink/40 mt-1">PATENTS · PENDING</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3 px-2 py-4 lg:py-2 lg:pl-8">
+                        <i data-lucide="graduation-cap" class="w-4 h-4 text-blue mt-0.5 shrink-0"></i>
+                        <div>
+                            <div class="text-sm font-semibold text-ink leading-snug">KAIST 박사 연구팀</div>
+                            <div class="font-mono text-[10px] tracking-wide text-ink/40 mt-1">SCI Q1 5편 · 470+ 피인용</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 · THE ENGINE — DARK ZONE (full bleed) -->
+            <section class="bg-ink text-paper">
+                <div class="max-w-[88rem] mx-auto px-6 py-28 md:py-36">
+                    <div class="grid lg:grid-cols-12 gap-12">
+                        <div class="lg:col-span-5 reveal">
+                            <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-6 flex items-center gap-3">
+                                <span class="inline-block w-8 h-px bg-blue"></span>
+                                THE ENGINE
+                            </div>
+                            <h2 class="font-display text-4xl md:text-6xl font-bold tracking-tight leading-[1.02]">
+                                Neural <span class="text-white/30">+</span> Symbolic<br>= <span class="text-blue">NSAi</span>
+                            </h2>
+                            <p class="mt-8 text-lg text-paper/55 leading-relaxed max-w-md">
+                                LLM의 유연함에 기호 추론기의 엄격함을 결합합니다. 그럴듯한 답이 아니라, 수학적으로 검증된 해법을 내놓습니다.
+                            </p>
+                        </div>
+
+                        <!-- 4-step pipeline as labelled architecture nodes -->
+                        <div class="lg:col-span-7 reveal" style="transition-delay:140ms;">
+                            <div class="grid sm:grid-cols-2 gap-px bg-white/10 border border-white/10">
+                                <div class="bg-ink p-7 relative">
+                                    <div class="absolute top-3 left-3 w-1.5 h-1.5 rounded-full bg-blue node-glow"></div>
+                                    <div class="font-mono text-blue text-xs mb-5 tracking-widest">01</div>
+                                    <h4 class="text-lg font-semibold mb-2">조건 구조화</h4>
+                                    <p class="text-sm text-paper/50 leading-relaxed">자연어 입력을 구조화된 논리 제약으로 변환해 의도를 명확히 합니다.</p>
+                                </div>
+                                <div class="bg-ink p-7 relative">
+                                    <div class="absolute top-3 left-3 w-1.5 h-1.5 rounded-full bg-blue node-glow"></div>
+                                    <div class="font-mono text-blue text-xs mb-5 tracking-widest">02</div>
+                                    <h4 class="text-lg font-semibold mb-2">최적화 계산</h4>
+                                    <p class="text-sm text-paper/50 leading-relaxed">수만 개의 제약을 동시에 만족하는 최적 경로를 수학적으로 연산합니다.</p>
+                                </div>
+                                <div class="bg-ink p-7 relative">
+                                    <div class="absolute top-3 left-3 w-1.5 h-1.5 rounded-full bg-blue node-glow"></div>
+                                    <div class="font-mono text-blue text-xs mb-5 tracking-widest">03</div>
+                                    <h4 class="text-lg font-semibold mb-2">실시간 검증</h4>
+                                    <p class="text-sm text-paper/50 leading-relaxed">운영 데이터와 대조해 실행 가능성을 0.1초 단위로 검증합니다.</p>
+                                </div>
+                                <div class="bg-ink p-7 relative">
+                                    <div class="absolute top-3 left-3 w-1.5 h-1.5 rounded-full bg-blue node-glow"></div>
+                                    <div class="font-mono text-blue text-xs mb-5 tracking-widest">04</div>
+                                    <h4 class="text-lg font-semibold mb-2">자동 리페어</h4>
+                                    <p class="text-sm text-paper/50 leading-relaxed">상황이 변하면 최소 수정으로 정합성을 유지하는 대안을 자동 생성합니다.</p>
+                                </div>
+                            </div>
+
+                            <!-- 3 differentiators -->
+                            <div class="mt-px grid sm:grid-cols-3 gap-px bg-white/10 border border-white/10 border-t-0">
+                                <div class="bg-ink p-6">
+                                    <i data-lucide="shield-check" class="w-5 h-5 text-blue mb-3"></i>
+                                    <div class="text-sm font-semibold">Verified Output</div>
+                                    <div class="font-mono text-[10px] tracking-wide text-paper/40 mt-1">검증된 결과만</div>
+                                </div>
+                                <div class="bg-ink p-6">
+                                    <i data-lucide="wrench" class="w-5 h-5 text-blue mb-3"></i>
+                                    <div class="text-sm font-semibold">Auto-Repair</div>
+                                    <div class="font-mono text-[10px] tracking-wide text-paper/40 mt-1">자동 복구</div>
+                                </div>
+                                <div class="bg-ink p-6">
+                                    <i data-lucide="list-checks" class="w-5 h-5 text-blue mb-3"></i>
+                                    <div class="text-sm font-semibold">Audit Log</div>
+                                    <div class="font-mono text-[10px] tracking-wide text-paper/40 mt-1">추론 감사 로그</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5 · THE PRODUCT — DARK ZONE, orange accent -->
+            <section class="bg-ink text-paper border-t border-white/10">
+                <div class="max-w-[88rem] mx-auto px-6 py-28 md:py-36">
+                    <div class="flex flex-wrap justify-between items-end gap-6 mb-14 reveal">
+                        <div>
+                            <div class="font-mono text-[11px] tracking-[0.22em] text-orange mb-6 flex items-center gap-3">
+                                <span class="inline-block w-8 h-px bg-orange"></span>
+                                THE PRODUCT
+                            </div>
+                            <h2 class="font-display text-4xl md:text-6xl font-bold tracking-tight">AirNotte</h2>
+                            <p class="mt-5 text-lg text-paper/55 max-w-lg leading-relaxed">대화 몇 번이면, 동선과 검증이 끝난 완성형 여행 일정.</p>
+                        </div>
+                        <button onclick="switchSection('airnotte','services')" class="group font-mono text-xs tracking-[0.18em] text-orange flex items-center gap-2 hover:gap-3 transition-all">
+                            제품 보기 <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- 3 stats -->
+                    <div class="grid grid-cols-3 gap-px bg-white/10 border border-white/10 mb-4 reveal">
+                        <div class="bg-ink p-6">
+                            <div class="font-display text-3xl md:text-4xl font-bold text-orange">15</div>
+                            <div class="font-mono text-[10px] tracking-wide text-paper/45 mt-2">가지 성향 분석</div>
+                        </div>
+                        <div class="bg-ink p-6">
+                            <div class="font-display text-3xl md:text-4xl font-bold text-orange">대화형</div>
+                            <div class="font-mono text-[10px] tracking-wide text-paper/45 mt-2">CONVERSATIONAL</div>
+                        </div>
+                        <div class="bg-ink p-6">
+                            <div class="font-display text-3xl md:text-4xl font-bold text-orange">실시간</div>
+                            <div class="font-mono text-[10px] tracking-wide text-paper/45 mt-2">VERIFICATION</div>
+                        </div>
+                    </div>
+
+                    <!-- Asymmetric BENTO of 6 real screenshots -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 reveal" style="transition-delay:120ms;">
+                        <!-- anchor 1: route (large) -->
+                        <figure class="col-span-2 lg:col-span-2 lg:row-span-2 group relative overflow-hidden border border-white/10 bg-black">
+                            <img src="./img/airnotte-route.webp" width="1100" height="692" loading="lazy" decoding="async" alt="동선 지도 — 최적 경로 시각화" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-[1.02] transition duration-700">
+                            <figcaption class="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-ink/95 to-transparent">
+                                <div class="font-mono text-[10px] tracking-[0.18em] text-orange">DAY ROUTE</div>
+                                <div class="text-base font-semibold mt-1">동선 지도</div>
+                            </figcaption>
+                        </figure>
+                        <!-- anchor 2: itinerary-3day (large tall) -->
+                        <figure class="col-span-2 lg:col-span-2 lg:row-span-2 group relative overflow-hidden border border-white/10 bg-black">
+                            <img src="./img/airnotte-itinerary-3day.webp" width="1100" height="838" loading="lazy" decoding="async" alt="3일 일정 — 자동 생성된 여행 일정" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-[1.02] transition duration-700">
+                            <figcaption class="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-ink/95 to-transparent">
+                                <div class="font-mono text-[10px] tracking-[0.18em] text-orange">ITINERARY</div>
+                                <div class="text-base font-semibold mt-1">맞춤 일정 자동 생성</div>
+                            </figcaption>
+                        </figure>
+                        <!-- small tiles -->
+                        <figure class="group relative overflow-hidden border border-white/10 bg-black aspect-[3/4]">
+                            <img src="./img/airnotte-chat-profile.webp" width="1100" height="688" loading="lazy" decoding="async" alt="대화형 성향 분석" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-700">
+                            <figcaption class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-ink/95 to-transparent">
+                                <div class="text-xs font-semibold">대화형 성향분석</div>
+                            </figcaption>
+                        </figure>
+                        <figure class="group relative overflow-hidden border border-white/10 bg-black aspect-[3/4]">
+                            <img src="./img/airnotte-itinerary-day.webp" width="1100" height="892" loading="lazy" decoding="async" alt="일자별 상세 일정" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-700">
+                            <figcaption class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-ink/95 to-transparent">
+                                <div class="text-xs font-semibold">일자별 상세</div>
+                            </figcaption>
+                        </figure>
+                        <figure class="group relative overflow-hidden border border-white/10 bg-black aspect-[3/4]">
+                            <img src="./img/airnotte-poi-list.webp" width="1100" height="1745" loading="lazy" decoding="async" alt="장소 추천 리스트" class="w-full h-full object-cover object-top opacity-80 group-hover:opacity-100 transition duration-700">
+                            <figcaption class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-ink/95 to-transparent">
+                                <div class="text-xs font-semibold">장소 추천</div>
+                            </figcaption>
+                        </figure>
+                        <figure class="group relative overflow-hidden border border-orange/40 node-glow-orange bg-black aspect-[3/4]">
+                            <img src="./img/airnotte-verify.webp" width="1100" height="891" loading="lazy" decoding="async" alt="실시간 정보 검증" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-700">
+                            <figcaption class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-ink/95 to-transparent">
+                                <div class="font-mono text-[9px] tracking-[0.18em] text-orange">VERIFIED</div>
+                                <div class="text-xs font-semibold mt-0.5">실시간 검증</div>
+                            </figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6 · THE PEDIGREE — back to light, scientific log -->
+            <section class="bg-paper">
+                <div class="max-w-[88rem] mx-auto px-6 py-28 md:py-36">
+                    <div class="grid lg:grid-cols-12 gap-12">
+                        <div class="lg:col-span-4 reveal">
+                            <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-6 flex items-center gap-3">
+                                <span class="inline-block w-8 h-px bg-blue"></span>
+                                THE PEDIGREE
+                            </div>
+                            <h2 class="font-display text-4xl md:text-5xl font-bold tracking-tight leading-[1.05]">학술적 토대<br>위에 짓습니다</h2>
+                            <p class="mt-6 text-ink/60 leading-relaxed max-w-sm">우리의 기술은 논문과 특허로 증명됩니다. 단순한 서비스가 아니라 검증된 연구의 산물입니다.</p>
+                        </div>
+                        <div class="lg:col-span-8 reveal" style="transition-delay:140ms;">
+                            <ul class="divide-y hair border-y hair">
+                                <li class="grid grid-cols-12 gap-4 py-6 items-baseline">
+                                    <div class="col-span-12 sm:col-span-3 font-mono text-[11px] tracking-wide text-blue">TEAM · KAIST</div>
+                                    <div class="col-span-12 sm:col-span-9">
+                                        <div class="text-lg font-semibold text-ink">KAIST 박사 연구팀</div>
+                                        <div class="text-sm text-ink/55 mt-1">AI · 최적화 전공. 복합 제약 문제 해결을 위한 NSAi 핵심 알고리즘 설계.</div>
+                                    </div>
+                                </li>
+                                <li class="grid grid-cols-12 gap-4 py-6 items-baseline">
+                                    <div class="col-span-12 sm:col-span-3 font-mono text-[11px] tracking-wide text-blue">PAPERS · SCI Q1</div>
+                                    <div class="col-span-12 sm:col-span-9">
+                                        <div class="text-lg font-semibold text-ink">SCI Q1 저널 5편</div>
+                                        <div class="font-mono text-xs text-ink/45 mt-1">470+ CITATIONS · 470회 이상 피인용</div>
+                                    </div>
+                                </li>
+                                <li class="grid grid-cols-12 gap-4 py-6 items-baseline">
+                                    <div class="col-span-12 sm:col-span-3 font-mono text-[11px] tracking-wide text-blue">PATENTS · 3</div>
+                                    <div class="col-span-12 sm:col-span-9">
+                                        <div class="text-lg font-semibold text-ink">NSAi 특허 3건 출원</div>
+                                        <div class="font-mono text-xs text-ink/45 mt-1">CONSTRAINT SOLVING · AUTO-REPAIR · VERIFICATION</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7 · ROADMAP — one quiet line -->
+            <section class="bg-white border-y hair">
+                <div class="max-w-[88rem] mx-auto px-6 py-20 flex items-center gap-5">
+                    <span class="font-mono text-[10px] tracking-[0.22em] text-ink/40 shrink-0">NEXT</span>
+                    <span class="h-px flex-1 bg-hair"></span>
+                    <span class="font-display text-xl md:text-2xl font-medium text-ink/70 tracking-tight">다음 제품을 준비 중입니다.</span>
+                </div>
+            </section>
+
+            <!-- 8 · TEAM + CONTACT CLOSE -->
+            <section class="bg-paper">
+                <div class="max-w-[88rem] mx-auto px-6 py-28 md:py-36">
+                    <div class="grid lg:grid-cols-12 gap-12 items-center">
+                        <div class="lg:col-span-7 reveal">
+                            <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-6 flex items-center gap-3">
+                                <span class="inline-block w-8 h-px bg-blue"></span>
+                                THE PEOPLE
+                            </div>
+                            <h2 class="font-display text-4xl md:text-6xl font-bold tracking-tight leading-[1.02]">KAIST 박사 연구진이<br>직접 설계합니다</h2>
+                            <p class="mt-8 text-lg text-ink/60 leading-relaxed max-w-xl">기술적 엄밀함이 사용자의 삶을 구체적으로 바꾸는 방식을 고민합니다. 함께 풀고 싶은 문제가 있다면 연락 주세요.</p>
+                            <button onclick="switchSection('contact','contact')" class="mt-10 group px-7 py-4 bg-ink text-paper font-medium hover:bg-blue transition-colors inline-flex items-center gap-2">
+                                문의하기 <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-0.5 transition-transform"></i>
+                            </button>
+                        </div>
+                        <div class="lg:col-span-5 reveal" style="transition-delay:140ms;">
+                            <div class="border hair bg-white p-8">
+                                <div class="font-mono text-[10px] tracking-[0.2em] text-ink/40 mb-6">LEADERSHIP</div>
+                                <div class="flex items-baseline justify-between border-b hair pb-4 mb-4">
+                                    <div class="text-2xl font-display font-bold tracking-tight">조혜리</div>
+                                    <div class="font-mono text-[11px] text-blue">CEO · PhD</div>
+                                </div>
+                                <p class="text-sm text-ink/55 leading-relaxed">KAIST · AI &amp; Optimization. NSAi 핵심 알고리즘 설계자이자 Trobai 대표이사.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- ============================================================= ABOUT -->
+        <section id="about" class="section bg-paper">
+            <div class="max-w-[88rem] mx-auto px-6 pt-32 md:pt-40 pb-28">
+                <div class="reveal max-w-3xl mb-20">
+                    <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-6 flex items-center gap-3">
+                        <span class="inline-block w-8 h-px bg-blue"></span>
+                        회사소개
+                    </div>
+                    <h1 class="font-display text-5xl md:text-7xl font-bold tracking-tight leading-[1.0]">기술과 일상의<br>가장 밀접한 결합</h1>
+                    <p class="mt-10 text-lg md:text-xl text-ink/65 leading-relaxed">
+                        Trobai는 유행하는 기술을 쫓지 않습니다. 기술적 엄밀함이 어떻게 사용자의 삶을 구체적으로 바꾸는지 고민하고, 그 결과를 제품으로 증명하는 AI 딥테크 스튜디오입니다.
+                    </p>
+                </div>
+
+                <!-- info grid -->
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-hair border hair reveal">
+                    <div class="bg-white p-8">
+                        <div class="font-mono text-[10px] tracking-[0.18em] text-ink/40 mb-2">회사명</div>
+                        <div class="text-lg font-semibold">주식회사 트로바이 (Trobai)</div>
+                    </div>
+                    <div class="bg-white p-8">
+                        <div class="font-mono text-[10px] tracking-[0.18em] text-ink/40 mb-2">대표이사</div>
+                        <div class="text-lg font-semibold">조혜리</div>
+                    </div>
+                    <div class="bg-white p-8">
+                        <div class="font-mono text-[10px] tracking-[0.18em] text-ink/40 mb-2">설립</div>
+                        <div class="text-lg font-semibold">2026년 1월</div>
+                    </div>
+                    <div class="bg-white p-8">
+                        <div class="font-mono text-[10px] tracking-[0.18em] text-ink/40 mb-2">소재지</div>
+                        <div class="text-lg font-semibold">서울특별시 강북구</div>
+                    </div>
+                    <div class="bg-white p-8">
+                        <div class="font-mono text-[10px] tracking-[0.18em] text-ink/40 mb-2">핵심기술</div>
+                        <div class="text-lg font-semibold">Neuro-Symbolic AI</div>
+                    </div>
+                    <div class="bg-white p-8">
+                        <div class="font-mono text-[10px] tracking-[0.18em] text-ink/40 mb-2">이메일</div>
+                        <a href="mailto:trobai@trobai.com" class="text-lg font-semibold hover:text-blue transition-colors">trobai@trobai.com</a>
+                    </div>
+                </div>
+
+                <!-- timeline -->
+                <div class="mt-24 reveal">
+                    <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-10">연혁 · HISTORY</div>
+                    <ul class="border-l hair pl-8 space-y-10">
+                        <li class="relative">
+                            <span class="absolute -left-[2.6rem] top-1.5 w-2.5 h-2.5 rounded-full bg-blue ring-4 ring-paper"></span>
+                            <div class="font-mono text-xs text-ink/45 mb-1">2026.01</div>
+                            <div class="text-lg font-semibold">주식회사 트로바이 설립</div>
+                        </li>
+                        <li class="relative">
+                            <span class="absolute -left-[2.6rem] top-1.5 w-2.5 h-2.5 rounded-full bg-blue ring-4 ring-paper"></span>
+                            <div class="font-mono text-xs text-ink/45 mb-1">2026.05</div>
+                            <div class="text-lg font-semibold">관광 오픈이노베이션 1등 선정</div>
+                            <div class="text-sm text-ink/50 mt-1">문화체육관광부 · 한국관광공사</div>
+                        </li>
+                        <li class="relative">
+                            <span class="absolute -left-[2.6rem] top-1.5 w-2.5 h-2.5 rounded-full bg-blue ring-4 ring-paper"></span>
+                            <div class="font-mono text-xs text-blue mb-1">NOW</div>
+                            <div class="text-lg font-semibold">AirNotte 준비중</div>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </section>
 
-        <!-- Services -->
-        <section class="block alt">
-            <div class="wrap">
-                <div class="sec-head reveal">
-                    <span class="kicker">Our Services</span>
-                    <h2>Trobai의 서비스</h2>
-                    <p>지금은 AirNotte 하나지만, 앞으로 더 많은 AI 서비스가 이곳에 추가됩니다.</p>
+        <!-- ============================================================= AIRNOTTE -->
+        <section id="airnotte" class="section bg-paper">
+            <!-- dark hero for product -->
+            <div class="bg-ink text-paper">
+                <div class="max-w-[88rem] mx-auto px-6 pt-36 md:pt-44 pb-24">
+                    <div class="grid lg:grid-cols-12 gap-12 items-center">
+                        <div class="lg:col-span-6 reveal">
+                            <div class="w-12 h-12 bg-orange flex items-center justify-center text-ink mb-8">
+                                <i data-lucide="navigation" class="w-6 h-6"></i>
+                            </div>
+                            <div class="font-mono text-[11px] tracking-[0.22em] text-orange mb-6">AIRNOTTE · AI TRAVEL PLANNER</div>
+                            <h1 class="font-display text-5xl md:text-7xl font-bold tracking-tight leading-[1.0]">
+                                대화 몇 번이면,<br><span class="text-orange">완성형 일정</span>
+                            </h1>
+                            <p class="mt-9 text-lg text-paper/60 leading-relaxed max-w-lg">
+                                AirNotte는 여행 성향을 15가지 기준으로 분석하고, 동선 최적화와 실시간 검증이 끝난 '믿을 수 있는' 일정을 제안합니다.
+                            </p>
+                            <button onclick="switchSection('contact','contact')" class="mt-10 group px-7 py-4 bg-orange text-ink font-semibold hover:bg-white transition-colors inline-flex items-center gap-2">
+                                제품 문의 <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-0.5 transition-transform"></i>
+                            </button>
+                        </div>
+                        <div class="lg:col-span-6 reveal" style="transition-delay:140ms;">
+                            <div class="border border-white/10 bg-black overflow-hidden">
+                                <img src="./img/airnotte-itinerary-3day.webp" width="1100" height="838" decoding="async" alt="AirNotte 3일 일정 화면" class="w-full block">
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="svc-grid">
-                    <div class="svc-card live reveal" onclick="switchSection('airnotte','services')">
-                        <div class="svc-top">
-                            <div class="svc-logo air">✈️</div>
-                            <div>
-                                <h3>AirNotte</h3>
-                                <span class="tag">AI 여행 플래너</span>
-                            </div>
+            </div>
+
+            <!-- 6 feature rows (light) -->
+            <div class="max-w-[88rem] mx-auto px-6 py-28">
+                <div class="font-mono text-[11px] tracking-[0.22em] text-orange mb-16 reveal">기능 · FEATURES</div>
+
+                <div class="space-y-px bg-hair border hair">
+                    <!-- 1 대화형 성향분석 -->
+                    <div class="bg-white grid lg:grid-cols-12 gap-8 p-8 md:p-12 items-center reveal">
+                        <div class="lg:col-span-5 order-2 lg:order-1">
+                            <div class="font-mono text-xs text-orange mb-3 flex items-center gap-2"><i data-lucide="message-square" class="w-4 h-4"></i> 01 / PROFILE</div>
+                            <h3 class="text-2xl font-display font-bold tracking-tight mb-3">대화형 성향분석</h3>
+                            <p class="text-ink/60 leading-relaxed max-w-md">설문이 아닌 대화를 통해 취향을 15가지 데이터 프로필로 변환합니다.</p>
                         </div>
-                        <p>대화 몇 번으로 나의 여행 성향을 분석하고, 동선·검증까지 끝낸 완성형 일정을 만들어 줍니다.</p>
-                        <span class="svc-link">자세히 보기 <span class="arrow">→</span></span>
+                        <div class="lg:col-span-7 order-1 lg:order-2"><div class="border hair overflow-hidden"><img src="./img/airnotte-chat-profile.webp" width="1100" height="688" loading="lazy" decoding="async" alt="대화형 성향분석 화면" class="w-full block"></div></div>
                     </div>
-                    <div class="svc-card reveal">
-                        <div class="svc-top">
-                            <div class="svc-logo ph">✦</div>
-                            <div>
-                                <h3>새로운 서비스</h3>
-                                <span class="tag">Coming Soon</span>
-                            </div>
+                    <!-- 2 맞춤일정 자동생성 -->
+                    <div class="bg-white grid lg:grid-cols-12 gap-8 p-8 md:p-12 items-center reveal">
+                        <div class="lg:col-span-7"><div class="border hair overflow-hidden"><img src="./img/airnotte-itinerary-3day.webp" width="1100" height="838" loading="lazy" decoding="async" alt="맞춤 일정 자동생성 화면" class="w-full block"></div></div>
+                        <div class="lg:col-span-5">
+                            <div class="font-mono text-xs text-orange mb-3 flex items-center gap-2"><i data-lucide="calendar-range" class="w-4 h-4"></i> 02 / ITINERARY</div>
+                            <h3 class="text-2xl font-display font-bold tracking-tight mb-3">맞춤일정 자동생성</h3>
+                            <p class="text-ink/60 leading-relaxed max-w-md">분석된 성향을 바탕으로 일정 전체를 자동으로 설계합니다.</p>
                         </div>
-                        <p>Trobai의 다음 AI 서비스를 준비하고 있습니다. 기대해 주세요.</p>
-                        <span class="svc-soon-label">준비 중</span>
                     </div>
-                    <div class="svc-card reveal">
-                        <div class="svc-top">
-                            <div class="svc-logo ph">✦</div>
-                            <div>
-                                <h3>새로운 서비스</h3>
-                                <span class="tag">Coming Soon</span>
-                            </div>
+                    <!-- 3 일자별 상세 -->
+                    <div class="bg-white grid lg:grid-cols-12 gap-8 p-8 md:p-12 items-center reveal">
+                        <div class="lg:col-span-5 order-2 lg:order-1">
+                            <div class="font-mono text-xs text-orange mb-3 flex items-center gap-2"><i data-lucide="list" class="w-4 h-4"></i> 03 / DAILY</div>
+                            <h3 class="text-2xl font-display font-bold tracking-tight mb-3">일자별 상세</h3>
+                            <p class="text-ink/60 leading-relaxed max-w-md">하루 단위로 시간·장소·이동을 정밀하게 구성해 보여줍니다.</p>
                         </div>
-                        <p>더 많은 영역에서 AI로 문제를 풀어갈 예정입니다.</p>
-                        <span class="svc-soon-label">준비 중</span>
+                        <div class="lg:col-span-7 order-1 lg:order-2"><div class="border hair overflow-hidden"><img src="./img/airnotte-itinerary-day.webp" width="1100" height="892" loading="lazy" decoding="async" alt="일자별 상세 일정 화면" class="w-full block"></div></div>
                     </div>
+                    <!-- 4 장소추천 -->
+                    <div class="bg-white grid lg:grid-cols-12 gap-8 p-8 md:p-12 items-center reveal">
+                        <div class="lg:col-span-7"><div class="border hair overflow-hidden max-h-[480px]"><img src="./img/airnotte-poi-list.webp" width="1100" height="1745" loading="lazy" decoding="async" alt="장소 추천 리스트 화면" class="w-full block object-top"></div></div>
+                        <div class="lg:col-span-5">
+                            <div class="font-mono text-xs text-orange mb-3 flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4"></i> 04 / PLACES</div>
+                            <h3 class="text-2xl font-display font-bold tracking-tight mb-3">장소추천</h3>
+                            <p class="text-ink/60 leading-relaxed max-w-md">취향 데이터로 명소와 맛집을 큐레이션합니다.</p>
+                        </div>
+                    </div>
+                    <!-- 5 동선지도 -->
+                    <div class="bg-white grid lg:grid-cols-12 gap-8 p-8 md:p-12 items-center reveal">
+                        <div class="lg:col-span-5 order-2 lg:order-1">
+                            <div class="font-mono text-xs text-orange mb-3 flex items-center gap-2"><i data-lucide="route" class="w-4 h-4"></i> 05 / ROUTE</div>
+                            <h3 class="text-2xl font-display font-bold tracking-tight mb-3">동선지도</h3>
+                            <p class="text-ink/60 leading-relaxed max-w-md">OSRM 기반 경로 연산으로 이동 거리와 시간을 최소화합니다.</p>
+                        </div>
+                        <div class="lg:col-span-7 order-1 lg:order-2"><div class="border hair overflow-hidden"><img src="./img/airnotte-route.webp" width="1100" height="692" loading="lazy" decoding="async" alt="동선 지도 화면" class="w-full block"></div></div>
+                    </div>
+                    <!-- 6 실시간 검증 -->
+                    <div class="bg-white grid lg:grid-cols-12 gap-8 p-8 md:p-12 items-center reveal">
+                        <div class="lg:col-span-7"><div class="border hair overflow-hidden"><img src="./img/airnotte-verify.webp" width="1100" height="891" loading="lazy" decoding="async" alt="실시간 정보 검증 화면" class="w-full block"></div></div>
+                        <div class="lg:col-span-5">
+                            <div class="font-mono text-xs text-orange mb-3 flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4"></i> 06 / VERIFY</div>
+                            <h3 class="text-2xl font-display font-bold tracking-tight mb-3">실시간 검증</h3>
+                            <p class="text-ink/60 leading-relaxed max-w-md">영업시간·휴무일·날씨를 교차 검증해 실행 가능한 일정만 제공합니다.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3 tech cards -->
+                <div class="mt-24 reveal">
+                    <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-10">기반 기술 · TECH</div>
+                    <div class="grid md:grid-cols-3 gap-px bg-hair border hair">
+                        <div class="bg-white p-8">
+                            <i data-lucide="brain-circuit" class="w-6 h-6 text-blue mb-5"></i>
+                            <h4 class="text-lg font-semibold mb-2">뉴로심볼릭 (NSAi)</h4>
+                            <p class="text-sm text-ink/55 leading-relaxed">LLM의 유연함과 기호 추론의 엄격함을 결합해 검증된 일정을 만듭니다.</p>
+                        </div>
+                        <div class="bg-white p-8">
+                            <i data-lucide="route" class="w-6 h-6 text-blue mb-5"></i>
+                            <h4 class="text-lg font-semibold mb-2">OSRM 동선 최적화</h4>
+                            <p class="text-sm text-ink/55 leading-relaxed">실제 도로망 기반 경로 연산으로 이동 효율을 극대화합니다.</p>
+                        </div>
+                        <div class="bg-white p-8">
+                            <i data-lucide="shield-check" class="w-6 h-6 text-blue mb-5"></i>
+                            <h4 class="text-lg font-semibold mb-2">실시간 검증</h4>
+                            <p class="text-sm text-ink/55 leading-relaxed">운영 데이터와 대조해 실행 가능성을 실시간으로 확인합니다.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                <div class="mt-20 border hair bg-ink text-paper p-10 md:p-14 flex flex-col md:flex-row md:items-center justify-between gap-8 reveal">
+                    <div>
+                        <h3 class="font-display text-3xl md:text-4xl font-bold tracking-tight">AirNotte가 궁금하신가요?</h3>
+                        <p class="mt-3 text-paper/55">제휴 · 도입 · 협업 문의를 기다립니다.</p>
+                    </div>
+                    <button onclick="switchSection('contact','contact')" class="group px-7 py-4 bg-orange text-ink font-semibold hover:bg-white transition-colors inline-flex items-center gap-2 shrink-0">
+                        문의하기 <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-0.5 transition-transform"></i>
+                    </button>
                 </div>
             </div>
         </section>
 
-        <!-- 회사 핵심 기술: NSAi -->
-        <section class="block">
-            <div class="wrap">
-                <div class="sec-head reveal">
-                    <span class="kicker">Neuro-Symbolic AI</span>
-                    <h2>그럴듯한 답이 아니라,<br>실행 가능한 해법</h2>
-                    <p>Trobai는 현실의 복합 제약 문제를 자연어로 받아 <strong>계산·검증·리페어</strong>하는 Neuro-Symbolic AI(NSAi) 실행 엔진을 만듭니다.</p>
-                </div>
+        <!-- ============================================================= DISCLOSURE -->
+        <section id="disclosure" class="section bg-paper">
+            <div class="max-w-[88rem] mx-auto px-6 pt-32 md:pt-40 pb-28">
 
-                <!-- Neural + Symbolic = NSAi -->
-                <div class="nsai-eq reveal">
-                    <div class="eq-card">
-                        <div class="eq-label">NEURAL AI</div>
-                        <h4>신경망의 이해력</h4>
-                        <p>자연어를 이해하고 의도를 해석</p>
+                <!-- ---------- LIST VIEW ---------- -->
+                <div id="disclosure-list">
+                    <div class="reveal max-w-2xl mb-16">
+                        <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-6 flex items-center gap-3">
+                            <span class="inline-block w-8 h-px bg-blue"></span>
+                            공시
+                        </div>
+                        <h1 class="font-display text-5xl md:text-7xl font-bold tracking-tight">공시</h1>
+                        <p class="mt-8 text-lg text-ink/65 leading-relaxed">Trobai의 기업 활동과 관련된 법정 공시 자료입니다.</p>
                     </div>
-                    <div class="eq-op">+</div>
-                    <div class="eq-card">
-                        <div class="eq-label">SYMBOLIC AI</div>
-                        <h4>기호 추론의 검증력</h4>
-                        <p>규칙·제약을 수학적으로 검증</p>
-                    </div>
-                    <div class="eq-op">=</div>
-                    <div class="eq-card accent">
-                        <div class="eq-label">NSAi</div>
-                        <h4>검증된 답</h4>
-                        <p>‘그럴듯한 답’이 아니라 수학적으로 검증된 답</p>
+
+                    <div class="border hair bg-white reveal">
+                        <div class="border-b hair px-6 md:px-8 py-4 font-mono text-[10px] tracking-[0.18em] text-ink/45 flex items-center gap-6">
+                            <span class="w-10 shrink-0">NO</span>
+                            <span class="flex-1">제목</span>
+                            <span class="hidden sm:block">일자</span>
+                        </div>
+                        <div id="disclosure-rows" class="divide-y divide-[#E6E6E1]"></div>
                     </div>
                 </div>
 
-                <!-- 엔진 4단계 파이프라인 -->
-                <div class="pipeline reveal">
-                    <div class="pipe-step"><div class="pipe-num">01</div><h4>조건 구조화</h4><p>자연어 입력을 시간·예산·접근성 등 형식 제약으로 변환합니다.</p></div>
-                    <div class="pipe-step"><div class="pipe-num">02</div><h4>최적화 계산</h4><p>모든 제약을 동시에 만족하는 수학적 최적해를 탐색합니다.</p></div>
-                    <div class="pipe-step"><div class="pipe-num">03</div><h4>실시간 검증</h4><p>운영정보·현장 데이터로 실행 가능성을 다시 검증합니다.</p></div>
-                    <div class="pipe-step"><div class="pipe-num">04</div><h4>자동 리페어</h4><p>깨진 조건을 감지해 최소 수정으로 대안을 다시 계산합니다.</p></div>
-                </div>
+                <!-- ---------- DETAIL VIEW ---------- -->
+                <div id="disclosure-detail" class="hidden max-w-3xl mx-auto"></div>
+
             </div>
         </section>
 
-        <!-- 기술로 증명하는 팀: 3대 차별점 + 신뢰 배지 -->
-        <section class="block alt">
-            <div class="wrap">
-                <div class="sec-head reveal">
-                    <span class="kicker">Why NSAi</span>
-                    <h2>기술로 증명하는 팀</h2>
-                    <p>기존 AI와 본질적으로 다른 세 가지 — 그리고 정부·산업·학계가 인정한 기술력입니다.</p>
-                </div>
-                <div class="vision-grid">
-                    <div class="vcard reveal"><div class="vico">✅</div><h4>Verified Output</h4><p>솔버가 모든 제약을 동시에 검증한 답만 출력합니다. 환각이 구조적으로 발생할 수 없습니다.</p></div>
-                    <div class="vcard reveal"><div class="vico">🔧</div><h4>Auto-Repair</h4><p>조건이 바뀌어 답이 깨지면, 최소한의 수정으로 만족 가능한 대안을 스스로 다시 찾습니다.</p></div>
-                    <div class="vcard reveal"><div class="vico">📋</div><h4>Audit Log</h4><p>어떤 제약을 어떤 순서로 만족시켰는지 모두 기록해, 의사결정 근거가 감사 가능합니다.</p></div>
-                </div>
+        <!-- ============================================================= CONTACT -->
+        <section id="contact" class="section bg-paper">
+            <div class="max-w-[88rem] mx-auto px-6 pt-32 md:pt-40 pb-28">
+                <div class="grid lg:grid-cols-2 gap-16 lg:gap-24">
+                    <div class="reveal">
+                        <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-6 flex items-center gap-3">
+                            <span class="inline-block w-8 h-px bg-blue"></span>
+                            문의하기
+                        </div>
+                        <h1 class="font-display text-5xl md:text-7xl font-bold tracking-tight leading-[1.0]">함께 문제를<br>풉시다</h1>
 
-                <!-- 신뢰 배지 -->
-                <div class="badge-grid reveal">
-                    <div class="badge-card">
-                        <div class="bc-ico gold">🏆</div>
-                        <div class="bc-title">관광 오픈이노베이션 <strong>1등</strong> 선정</div>
-                        <div class="bc-sub">문체부 · 한국관광공사</div>
+                        <div class="mt-14 space-y-10">
+                            <div class="flex items-start gap-4">
+                                <span class="w-10 h-10 border hair flex items-center justify-center text-blue shrink-0">
+                                    <i data-lucide="mail" class="w-5 h-5"></i>
+                                </span>
+                                <div>
+                                    <div class="font-mono text-[10px] tracking-[0.18em] text-ink/40 mb-1">EMAIL</div>
+                                    <a href="mailto:trobai@trobai.com" class="text-xl font-semibold hover:text-blue transition-colors">trobai@trobai.com</a>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <span class="w-10 h-10 border hair flex items-center justify-center text-blue shrink-0">
+                                    <i data-lucide="map-pin" class="w-5 h-5"></i>
+                                </span>
+                                <div>
+                                    <div class="font-mono text-[10px] tracking-[0.18em] text-ink/40 mb-1">STUDIO</div>
+                                    <div class="text-lg font-semibold leading-snug">서울특별시 강북구 노해로23길 123<br>5층 505호</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="badge-card">
-                        <div class="bc-ico gold">🥇</div>
-                        <div class="bc-title">과기정통부 <strong>AI Champion</strong> 선정</div>
-                        <div class="bc-sub">범용 NSAi 솔루션</div>
-                    </div>
-                    <div class="badge-card">
-                        <div class="bc-ico blue">📜</div>
-                        <div class="bc-title">NSAi 코어 <strong>특허 3건</strong> 출원</div>
-                        <div class="bc-sub">조건 구조화 · 최적화 · 리페어</div>
-                    </div>
-                    <div class="badge-card">
-                        <div class="bc-ico blue">🎓</div>
-                        <div class="bc-title">KAIST 박사 연구팀</div>
-                        <div class="bc-sub">SCI Q1 5편 · 470+ 피인용</div>
+
+                    <div class="border hair bg-white p-8 md:p-12 reveal" style="transition-delay:160ms;">
+                        <form id="contactForm" onsubmit="submitContact(event)" class="space-y-6">
+                            <div>
+                                <label for="f-subject" class="block font-mono text-[10px] tracking-[0.18em] text-ink/45 mb-2">제목</label>
+                                <input id="f-subject" type="text" name="subject" required class="w-full px-5 py-4 bg-paper border hair focus:outline-none focus:border-blue focus:ring-1 focus:ring-blue transition-colors" placeholder="문의 제목을 입력하세요">
+                            </div>
+                            <div>
+                                <label for="f-message" class="block font-mono text-[10px] tracking-[0.18em] text-ink/45 mb-2">내용</label>
+                                <textarea id="f-message" name="message" required rows="6" class="w-full px-5 py-4 bg-paper border hair focus:outline-none focus:border-blue focus:ring-1 focus:ring-blue transition-colors resize-y" placeholder="문의 내용을 자세히 적어주세요"></textarea>
+                            </div>
+                            <input type="text" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true">
+                            <button type="submit" id="submitBtn" class="w-full py-4 bg-ink text-paper font-medium hover:bg-blue transition-colors flex items-center justify-center gap-2">
+                                보내기 <i data-lucide="send" class="w-4 h-4"></i>
+                            </button>
+                            <div id="formStatus" class="text-center text-sm font-medium pt-1" role="status" aria-live="polite"></div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -605,436 +752,376 @@
 
     </main>
 
-    <!-- ============ ABOUT (회사소개) ============ -->
-    <section id="about" class="section">
-        <section class="block">
-            <div class="wrap">
-                <div class="sec-head reveal">
-                    <span class="kicker">About</span>
-                    <h2>회사 소개</h2>
-                    <p>Trobai가 어떤 회사인지 소개합니다.</p>
+    <!-- ============ FOOTER ============ -->
+    <footer class="bg-white border-t hair">
+        <div class="max-w-[88rem] mx-auto px-6 py-20">
+            <div class="grid md:grid-cols-12 gap-12 mb-16">
+                <div class="md:col-span-6">
+                    <div class="font-display text-2xl font-bold tracking-tight mb-5">Trobai</div>
+                    <p class="text-sm text-ink/55 leading-relaxed max-w-xs">여행의 지능 레이어를 만드는 AI 딥테크 스튜디오.</p>
                 </div>
-                <div class="about-intro reveal">
-                    <p>주식회사 트로바이(Trobai)는 현실의 복합 제약 문제를 자연어로 받아 <strong>계산·검증·리페어</strong>하는 Neuro-Symbolic AI(NSAi) 엔진을 만드는 스타트업입니다.</p>
-                    <p>‘그럴듯한 답이 아니라, 실행 가능한 해법’을 목표로 검증 가능한 AI를 연구하고 실제 제품으로 구현합니다. 그 첫 번째 서비스가 AI 여행 플래너 <strong>AirNotte</strong>입니다.</p>
+                <div class="md:col-span-3">
+                    <div class="font-mono text-[10px] tracking-[0.18em] text-ink/40 mb-5">바로가기</div>
+                    <ul class="space-y-3 text-sm font-medium text-ink/70">
+                        <li><button onclick="switchSection('home','home')" class="hover:text-blue transition-colors">홈</button></li>
+                        <li><button onclick="switchSection('about','about')" class="hover:text-blue transition-colors">회사소개</button></li>
+                        <li><button onclick="switchSection('airnotte','services')" class="hover:text-blue transition-colors">AirNotte</button></li>
+                        <li><button onclick="switchSection('disclosure','disclosure')" class="hover:text-blue transition-colors">공시</button></li>
+                        <li><button onclick="switchSection('contact','contact')" class="hover:text-blue transition-colors">문의하기</button></li>
+                    </ul>
                 </div>
-                <div class="info-cards reveal">
-                    <div class="info-cell"><span class="info-k">회사명</span><span class="info-v">주식회사 트로바이 (Trobai)</span></div>
-                    <div class="info-cell"><span class="info-k">대표이사</span><span class="info-v">조혜리</span></div>
-                    <div class="info-cell"><span class="info-k">설립</span><span class="info-v">2026년 1월</span></div>
-                    <div class="info-cell"><span class="info-k">소재지</span><span class="info-v">서울특별시 강북구</span></div>
-                    <div class="info-cell"><span class="info-k">핵심 기술</span><span class="info-v">Neuro-Symbolic AI</span></div>
-                    <div class="info-cell"><span class="info-k">이메일</span><span class="info-v">trobai@trobai.com</span></div>
-                </div>
-            </div>
-        </section>
-
-        <section class="block alt">
-            <div class="wrap">
-                <div class="sec-head reveal">
-                    <span class="kicker">History</span>
-                    <h2>회사 연혁</h2>
-                    <p>Trobai가 걸어온 길과 앞으로의 방향입니다.</p>
-                </div>
-                <div class="timeline reveal">
-                    <div class="tl-item">
-                        <div class="tl-date">2026. 01</div>
-                        <div class="tl-title">Trobai 설립</div>
-                        <div class="tl-desc">AI 기반 서비스 개발을 목표로 법인을 설립했습니다.</div>
-                    </div>
-                    <div class="tl-item">
-                        <div class="tl-date">2026. 05</div>
-                        <div class="tl-title">관광 오픈이노베이션 공모 사업 선정</div>
-                        <div class="tl-desc">관광 오픈이노베이션 공모 사업에 선정되었습니다.</div>
-                    </div>
-                    <div class="tl-item future">
-                        <div class="tl-date">Now</div>
-                        <div class="tl-title">AirNotte 준비 중</div>
-                        <div class="tl-desc">대화형 AI 여행 플래너 AirNotte를 개발하고 있습니다.</div>
+                <div class="md:col-span-3">
+                    <div class="font-mono text-[10px] tracking-[0.18em] text-ink/40 mb-5">회사 정보</div>
+                    <div class="text-sm text-ink/60 leading-relaxed space-y-2">
+                        <div>대표이사 조혜리</div>
+                        <div><a href="mailto:trobai@trobai.com" class="hover:text-blue transition-colors">trobai@trobai.com</a></div>
+                        <div>서울특별시 강북구 노해로23길 123,<br>5층 505호 (수유동, 강북청년창업마루)</div>
                     </div>
                 </div>
             </div>
-        </section>
-    </section>
-
-    <!-- ============ AIRNOTTE ============ -->
-    <section id="airnotte" class="section">
-        <div class="air-hero">
-            <div class="air-logo-row">
-                <div class="air-logo">✈️</div>
-                <span class="air-logo-name">AirNotte</span>
+            <div class="pt-10 border-t hair">
+                <div class="font-mono text-[10px] tracking-[0.18em] text-ink/40">© 2026 TROBAI. ALL RIGHTS RESERVED.</div>
             </div>
-            <h1>대화 몇 번이면,<br><span class="grad">완성형 여행 일정</span></h1>
-            <p>AirNotte는 AI와의 대화로 당신의 여행 성향을 분석하고, 일정·동선·실제 정보 검증까지 한 번에 끝내주는 맞춤형 여행 플래너입니다.</p>
-            <div class="cta-row">
-                <button class="btn btn-air" onclick="switchSection('contact','contact')">도입·협업 문의 →</button>
-            </div>
-            <div class="air-stats">
-                <div class="air-stat"><div class="num">15</div><div class="lbl">가지 여행 성향 분석</div></div>
-                <div class="air-stat"><div class="num">대화형</div><div class="lbl">간편한 일정 생성</div></div>
-                <div class="air-stat"><div class="num">실시간</div><div class="lbl">운영정보·날씨 검증</div></div>
-            </div>
-        </div>
-
-        <div class="wrap">
-            <!-- 1. 대화형 성향 분석 -->
-            <div class="feature-row">
-                <div class="feature-text reveal">
-                    <span class="feature-step">1</span>
-                    <h3>대화형 성향 분석</h3>
-                    <p>복잡한 설문은 그만. AI 플래너와 자연스럽게 대화하면 여행 스타일, 예산, 숙박 취향까지 15가지 기준으로 당신의 성향을 분석합니다.</p>
-                    <div class="feature-tags"><span>현지 문화 몰입형</span><span>15가지 프로파일</span><span>신뢰도 분석</span></div>
-                </div>
-                <div class="feature-media reveal">
-                    <div class="app-frame">
-                        <img src="./img/airnotte-chat-profile.webp" width="1100" height="688" alt="AirNotte AI 채팅과 15가지 여행 성향 분석 화면" decoding="async">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 2. 맞춤 일정 생성 -->
-            <div class="feature-row flip">
-                <div class="feature-text reveal">
-                    <span class="feature-step">2</span>
-                    <h3>AI 맞춤 일정 자동 생성</h3>
-                    <p>분석된 성향을 바탕으로 며칠치 여행 일정을 한 번에 만들어 줍니다. 날짜별 테마와 동선까지 고려한 현실적인 코스를 제안합니다.</p>
-                    <div class="feature-tags"><span>일자별 자동 구성</span><span>테마 기반 추천</span></div>
-                </div>
-                <div class="feature-media reveal">
-                    <div class="app-frame">
-                        <img src="./img/airnotte-itinerary-3day.webp" width="1100" height="838" alt="AirNotte 3일 전체 여행 일정 자동 생성 화면" loading="lazy" decoding="async">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. 일자별 상세 -->
-            <div class="feature-row">
-                <div class="feature-text reveal">
-                    <span class="feature-step">3</span>
-                    <h3>일자별 상세 코스</h3>
-                    <p>각 날짜마다 시간대별 방문지, 이동 정보, 추천 활동을 상세하게 정리합니다. 날씨와 메뉴 정보까지 한눈에 확인하세요.</p>
-                    <div class="feature-tags"><span>시간대별 일정</span><span>방문지 상세정보</span></div>
-                </div>
-                <div class="feature-media reveal">
-                    <div class="app-frame">
-                        <img src="./img/airnotte-itinerary-day.webp" width="1100" height="892" alt="AirNotte 일자별 상세 일정 화면" loading="lazy" decoding="async">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. 장소 추천 -->
-            <div class="feature-row flip">
-                <div class="feature-text reveal">
-                    <span class="feature-step">4</span>
-                    <h3>장소 추천 &amp; 정보</h3>
-                    <p>가볼 만한 명소·맛집을 사진과 함께 추천하고, 영업시간·접근성 같은 실용 정보를 제공해 선택을 돕습니다.</p>
-                    <div class="feature-tags"><span>명소·맛집</span><span>실용 정보</span></div>
-                </div>
-                <div class="feature-media reveal">
-                    <div class="app-frame">
-                        <img src="./img/airnotte-poi-list.webp" width="1100" height="1745" alt="AirNotte 추천 장소 리스트 화면" loading="lazy" decoding="async">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 5. 동선 지도 -->
-            <div class="feature-row">
-                <div class="feature-text reveal">
-                    <span class="feature-step">5</span>
-                    <h3>동선 최적화 지도</h3>
-                    <p>하루 동선을 지도 위에 그려 이동 거리와 시간을 최소화합니다. 헛걸음 없는 효율적인 여행을 설계합니다.</p>
-                    <div class="feature-tags"><span>지도 시각화</span><span>이동거리 최소화</span></div>
-                </div>
-                <div class="feature-media reveal">
-                    <div class="app-frame">
-                        <img src="./img/airnotte-route.webp" width="1100" height="692" alt="AirNotte 지도 동선 최적화 화면" loading="lazy" decoding="async">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 6. 검증 -->
-            <div class="feature-row flip">
-                <div class="feature-text reveal">
-                    <span class="feature-step">6</span>
-                    <h3>실시간 정보 검증</h3>
-                    <p>운영시간, 휴무일, 날씨를 실제 데이터로 자동 검증합니다. AI가 만든 일정이지만 믿고 떠날 수 있습니다.</p>
-                    <div class="feature-tags"><span>운영시간 확인</span><span>휴무·날씨 검증</span></div>
-                </div>
-                <div class="feature-media reveal">
-                    <div class="app-frame">
-                        <img src="./img/airnotte-verify.webp" width="1100" height="891" alt="AirNotte 일정 정보 검증 결과 화면" loading="lazy" decoding="async">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- AirNotte 기술 -->
-        <div class="block alt">
-            <div class="wrap">
-                <div class="sec-head reveal">
-                    <span class="kicker">Technology</span>
-                    <h2>AirNotte를 움직이는 기술</h2>
-                    <p>화면 뒤에서는 이런 기술이 일정을 더 정확하고 믿을 수 있게 만듭니다.</p>
-                </div>
-                <div class="vision-grid">
-                    <div class="vcard reveal"><div class="tech-ico">🧮</div><h4>뉴로심볼릭 알고리즘</h4><p>생성형 AI에 수학·규칙 기반 검증을 결합해, ‘그럴듯한 추천’이 아니라 근거 있는 추천을 만듭니다.</p></div>
-                    <div class="vcard reveal"><div class="tech-ico">🗺️</div><h4>OSRM 실제 도로 내비게이션</h4><p>실제 도로망 데이터(OSRM)로 이동 거리와 시간을 계산해, 헛걸음 없는 현실적인 동선을 설계합니다.</p></div>
-                    <div class="vcard reveal"><div class="tech-ico">🛰️</div><h4>실시간 데이터 검증</h4><p>운영시간·휴무·날씨 같은 실제 데이터와 대조해 일정을 자동으로 검증합니다.</p></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="air-cta">
-            <div class="sec-head reveal" style="margin-bottom:1.5rem;">
-                <h2 style="font-size:clamp(1.5rem,3.5vw,2rem)">AirNotte와 함께하고 싶으세요?</h2>
-                <p>도입, 제휴, 투자 등 어떤 이야기든 환영합니다.</p>
-            </div>
-            <button class="btn btn-air" onclick="switchSection('contact','contact')">문의하기 →</button>
-        </div>
-    </section>
-
-    <!-- ============ DISCLOSURE (기존 공시 구조 유지) ============ -->
-    <section id="disclosure" class="section">
-        <section class="block">
-            <div class="wrap">
-                <div class="sec-head">
-                    <span class="kicker">Disclosure</span>
-                    <h2>📋 공시</h2>
-                    <p>회사 관련 공시 자료를 확인하실 수 있습니다.</p>
-                </div>
-                <div class="board-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th class="col-no">번호</th>
-                                <th class="col-title">제목</th>
-                                <th class="col-date">등록일</th>
-                                <th class="col-file">첨부파일</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="col-no">1</td>
-                                <td class="col-title">설립공고</td>
-                                <td class="col-date">2026.01.19</td>
-                                <td class="col-file">
-                                    <a href="./pdf/설립공고.pdf" class="file-link" target="_blank" rel="noopener">📎 PDF</a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-    </section>
-
-    <!-- ============ CONTACT ============ -->
-    <section id="contact" class="section">
-        <section class="block">
-            <div class="wrap">
-                <div class="contact-grid">
-                    <div class="contact-info reveal">
-                        <span class="kicker" style="color:var(--accent);font-weight:700;font-size:0.82rem;letter-spacing:0.04em;text-transform:uppercase;">Contact</span>
-                        <h2>문의하기</h2>
-                        <p>협업 제안, 서비스 도입, 채용, 그 밖의 궁금한 점을 남겨주세요. 확인 후 빠르게 답변드리겠습니다.</p>
-                        <div class="contact-detail"><span class="ci">✉️</span><a href="mailto:trobai@trobai.com">trobai@trobai.com</a></div>
-                        <div class="contact-detail"><span class="ci">📍</span><span>서울특별시 강북구 노해로23길 123, 5층 505호</span></div>
-                    </div>
-
-                    <div class="form-card reveal">
-                        <form id="contactForm" onsubmit="submitContact(event)">
-                            <div class="field">
-                                <label for="cf-subject">제목</label>
-                                <input type="text" id="cf-subject" name="subject" required maxlength="120" placeholder="문의 제목을 입력해주세요">
-                            </div>
-                            <div class="field">
-                                <label for="cf-message">내용</label>
-                                <textarea id="cf-message" name="message" required maxlength="3000" placeholder="문의 내용을 자세히 적어주세요"></textarea>
-                            </div>
-                            <!-- 스팸 방지용 허니팟 (사람에게는 안 보임) -->
-                            <input type="text" class="hp-field" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true">
-                            <button type="submit" class="btn btn-primary submit-btn">보내기</button>
-                            <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </section>
-
-    <!-- ============ Footer ============ -->
-    <footer class="footer">
-        <div class="footer-inner">
-            <div class="footer-top">
-                <div class="footer-brand">
-                    <div class="fb-logo">
-                        <img src="./img/logo.png" class="logo-img" alt="Trobai">
-                        <span class="logo-text">Trobai</span>
-                    </div>
-                    <p>AI 기술로 일상을 더 편리하게 만드는 서비스를 개발하는 스타트업입니다.</p>
-                </div>
-                <div class="footer-info">
-                    <div class="row"><span class="k">회사명</span><span class="v">Trobai</span></div>
-                    <div class="row"><span class="k">대표이사</span><span class="v">조혜리</span></div>
-                    <div class="row"><span class="k">이메일</span><span class="v"><a href="mailto:trobai@trobai.com">trobai@trobai.com</a></span></div>
-                    <div class="row"><span class="k">주소</span><span class="v">서울특별시 강북구 노해로23길 123, 5층 505호<br>(수유동, 강북청년창업마루)</span></div>
-                </div>
-            </div>
-            <div class="footer-bottom">© 2026 Trobai. All rights reserved.</div>
         </div>
     </footer>
 
+    <!-- ============ SCRIPTS ============ -->
+    <script type="module">
+      import {
+        createIcons, ChevronDown, ChevronRight, Navigation, Sparkles, Menu, ArrowRight, ArrowUpRight, ArrowLeft,
+        Award, Medal, ScrollText, GraduationCap, ShieldCheck, Wrench, ListChecks, Printer,
+        MessageSquare, CalendarRange, List, MapPin, Route, BrainCircuit, FileText, Mail, Send, Loader2
+      } from 'https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/esm/lucide.js';
+
+      window.__lucide = {
+        ChevronDown, ChevronRight, Navigation, Sparkles, Menu, ArrowRight, ArrowUpRight, ArrowLeft,
+        Award, Medal, ScrollText, GraduationCap, ShieldCheck, Wrench, ListChecks, Printer,
+        MessageSquare, CalendarRange, List, MapPin, Route, BrainCircuit, FileText, Mail, Send, Loader2
+      };
+      window.renderIcons = () => createIcons({ icons: window.__lucide });
+      window.renderIcons();
+    </script>
+
     <script>
-        /* ---------- 섹션 전환 ---------- */
-        const NAV_OF = { home: null, about: 'about', airnotte: 'services', disclosure: 'disclosure', contact: 'contact' };
+        const NAV_OF = {
+          home: 'home',
+          about: 'about',
+          airnotte: 'services',
+          disclosure: 'disclosure',
+          contact: 'contact'
+        };
 
-        function switchSection(id, navKey, anchorId, fromPop) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            const sec = document.getElementById(id);
-            if (sec) sec.classList.add('active');
+        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-            document.querySelectorAll('[data-nav]').forEach(n => {
-                n.classList.remove('active');
-                n.removeAttribute('aria-current');
-            });
-            if (navKey) {
-                document.querySelectorAll('[data-nav="' + navKey + '"]').forEach(n => {
-                    n.classList.add('active');
-                    n.setAttribute('aria-current', 'page');
-                });
+        /* ===================== 공시 (Disclosure) data + rendering ===================== */
+        const NOTICES = [
+          {
+            slug: 'establishment',
+            no: '001',
+            title: '설립공고',
+            category: '설립',
+            date: '2026.01.19',
+            dateISO: '2026-01-19',
+            updated: null,
+            pdfUrl: './pdf/설립공고.pdf',
+            bodyHtml: `
+              <p class="mb-8">주식회사 트로바이는 2026년 1월 19일자로 법인 설립등기를 완료하였으므로, 회사의 공고방법에 관한 정관 규정에 따라 다음과 같이 공고합니다.</p>
+
+              <div class="font-mono text-[10px] tracking-[0.2em] text-ink/45 mb-4">설립 개요</div>
+              <dl class="border-t hair divide-y divide-[#E6E6E1] mb-12">
+                <div class="flex flex-col sm:flex-row sm:gap-8 py-4">
+                  <dt class="font-mono text-xs text-ink/45 sm:w-40 shrink-0 mb-1 sm:mb-0">상호</dt>
+                  <dd class="text-ink">주식회사 트로바이 (Trobai)</dd>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:gap-8 py-4">
+                  <dt class="font-mono text-xs text-ink/45 sm:w-40 shrink-0 mb-1 sm:mb-0">대표이사</dt>
+                  <dd class="text-ink">조혜리</dd>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:gap-8 py-4">
+                  <dt class="font-mono text-xs text-ink/45 sm:w-40 shrink-0 mb-1 sm:mb-0">본점 소재지</dt>
+                  <dd class="text-ink">서울특별시 강북구 노해로23길 123, 5층 505호 (수유동, 강북청년창업마루)</dd>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:gap-8 py-4">
+                  <dt class="font-mono text-xs text-ink/45 sm:w-40 shrink-0 mb-1 sm:mb-0">설립연월일</dt>
+                  <dd class="text-ink">2026년 1월 19일</dd>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:gap-8 py-4">
+                  <dt class="font-mono text-xs text-ink/45 sm:w-40 shrink-0 mb-1 sm:mb-0">사업목적</dt>
+                  <dd class="text-ink">인공지능(Neuro-Symbolic AI) 기반 소프트웨어 개발 및 여행 플래닝 서비스 제공</dd>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:gap-8 py-4">
+                  <dt class="font-mono text-xs text-ink/45 sm:w-40 shrink-0 mb-1 sm:mb-0">공고방법</dt>
+                  <dd class="text-ink">회사 인터넷 홈페이지 게재</dd>
+                </div>
+              </dl>
+
+              <p class="text-right text-ink/70 mb-8">2026년 1월 19일</p>
+              <div class="text-right">
+                <p class="font-semibold text-ink">주식회사 트로바이</p>
+                <p class="text-ink">대표이사 조 혜 리</p>
+              </div>
+            `
+          },
+          {
+            slug: 'establishment-greeting',
+            no: '002',
+            title: '설립 인사문',
+            category: '설립',
+            date: '2026.01.19',
+            dateISO: '2026-01-19',
+            updated: null,
+            pdfUrl: './pdf/설립공고.pdf',
+            bodyHtml: `
+              <p class="font-semibold text-ink text-lg mb-8">여행의 설렘을 완성하다, 주식회사 트로바이(Trobai)의 새로운 시작!</p>
+              <p class="mb-6">고객 여러분, 안녕하십니까?</p>
+              <p class="mb-6">2026년 1월 19일, 주식회사 트로바이가 법인 설립을 완료하고 여러분의 여행을 변화시킬 첫 항해를 시작합니다.</p>
+              <p class="mb-6">트로바이는 "기술로 여행의 자유를, 데이터로 당신만의 이야기를"이라는 비전 아래 설립되었습니다. 우리는 단순히 장소를 추천하고 예약을 돕는 플랫폼을 넘어, 복잡한 계획의 부담은 기술에 맡기고 여러분은 오롯이 여행의 즐거움에만 집중할 수 있도록 돕는 가장 든든한 여행 파트너가 되고자 합니다.</p>
+              <p class="mb-10">나보다 나를 더 잘 아는 섬세함으로, 낯선 곳에서도 안심할 수 있는 든든함으로, 트로바이는 누구나 꿈꾸던 여행을 현실로 만들어 드리겠습니다. 오늘 심은 작은 씨앗이 전 세계 여행자들의 발길을 이끄는 거대한 이정표가 될 수 있도록 임직원 모두가 한마음으로 뛰겠습니다.</p>
+
+              <div class="font-mono text-[10px] tracking-[0.2em] text-blue mb-5">우리의 약속</div>
+              <ul class="border-t hair divide-y divide-[#E6E6E1] mb-10">
+                <li class="py-4"><span class="font-semibold text-ink">혁신 (Innovation)</span>: 여행 준비의 번거로움은 줄이고, 경험의 깊이는 더하는 새로운 기준을 만들겠습니다.</li>
+                <li class="py-4"><span class="font-semibold text-ink">신뢰 (Trust)</span>: 막연한 정보가 아닌, 믿을 수 있는 여정만을 설계하여 고객과의 약속을 최우선으로 지키겠습니다.</li>
+                <li class="py-4"><span class="font-semibold text-ink">공감 (Connection)</span>: 고객 한 분 한 분의 취향을 깊이 이해하고, 함께 호흡하며 성장하는 파트너가 되겠습니다.</li>
+              </ul>
+
+              <p class="mb-10">주식회사 트로바이가 만들어갈 여행의 새로운 미래를 따뜻한 시선으로 지켜봐 주십시오. 감사합니다.</p>
+
+              <p class="text-right text-ink/70 mb-6">2026. 01. 19.</p>
+              <div class="text-right">
+                <p class="font-semibold text-ink">주식회사 트로바이 임직원 일동</p>
+              </div>
+            `
+          }
+        ];
+
+        function renderList() {
+            const wrap = document.getElementById('disclosure-rows');
+            if (!wrap) return;
+            const sorted = [...NOTICES].sort((a, b) => b.dateISO.localeCompare(a.dateISO));
+            if (!sorted.length) {
+                wrap.innerHTML = '<div class="px-6 md:px-8 py-12 text-center text-sm text-ink/50">등록된 공고가 없습니다.</div>';
+                return;
+            }
+            wrap.innerHTML = sorted.map(n => `
+              <a href="#disclosure/${n.slug}" onclick="openNotice('${n.slug}');return false;"
+                 class="group flex items-center gap-6 px-6 md:px-8 py-6 hover:bg-ink/[0.02] transition-colors">
+                <span class="w-10 shrink-0 font-mono text-sm text-blue">${n.no}</span>
+                <span class="flex-1 min-w-0 flex items-center gap-3 flex-wrap">
+                  <span class="font-semibold text-ink truncate">${n.title}</span>
+                  <span class="disclosure-badge font-mono text-[10px] tracking-[0.12em] uppercase border hair bg-blue/[0.06] text-blue px-2 py-0.5 shrink-0">${n.category}</span>
+                </span>
+                <time datetime="${n.dateISO}" class="hidden sm:block font-mono text-sm text-ink/55 shrink-0">${n.date}</time>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-ink/40 shrink-0 group-hover:translate-x-1 transition-transform"></i>
+              </a>
+            `).join('');
+        }
+
+        function renderDisclosure(slug) {
+            const listEl = document.getElementById('disclosure-list');
+            const detailEl = document.getElementById('disclosure-detail');
+            if (!listEl || !detailEl) return;
+
+            renderList();
+
+            if (!slug) {
+                detailEl.classList.add('hidden');
+                detailEl.innerHTML = '';
+                listEl.classList.remove('hidden');
+                window.scrollTo(0, 0);
+                if (window.renderIcons) window.renderIcons();
+                return;
             }
 
-            closeDropdown();
-            closeMenu();
+            const n = NOTICES.find(x => x.slug === slug);
+            if (!n) { renderDisclosure(null); return; }
 
-            // 브라우저 뒤로가기 지원: 직접 클릭으로 이동할 때만 히스토리에 기록
-            if (!fromPop) {
-                history.pushState({ id: id, navKey: navKey || null, anchorId: anchorId || null }, '', '#' + id);
-            }
+            const pdfLink = n.pdfUrl ? `
+                <a href="${n.pdfUrl}" target="_blank" rel="noopener"
+                   class="inline-flex items-center gap-2 text-sm text-ink/65 hover:text-blue transition-colors">
+                  <i data-lucide="file-text" class="w-4 h-4"></i> PDF 원본
+                </a>` : '';
 
-            if (anchorId) {
-                requestAnimationFrame(() => {
-                    document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                });
-            } else {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+            detailEl.innerHTML = `
+              <div class="no-print flex items-center justify-between gap-4 mb-12 flex-wrap">
+                <a href="#disclosure" onclick="openNotice('');return false;"
+                   class="inline-flex items-center gap-2 text-sm text-ink/65 hover:text-blue transition-colors">
+                  <i data-lucide="arrow-left" class="w-4 h-4"></i> 공시 목록
+                </a>
+                <div class="flex items-center gap-5">
+                  <button type="button" onclick="window.print()"
+                          class="inline-flex items-center gap-2 text-sm text-ink/65 hover:text-blue transition-colors">
+                    <i data-lucide="printer" class="w-4 h-4"></i> 인쇄
+                  </button>
+                  ${pdfLink}
+                </div>
+              </div>
+
+              <header class="mb-10 pb-8 border-b hair">
+                <div class="flex items-center gap-3 mb-5">
+                  <span class="disclosure-badge font-mono text-[10px] tracking-[0.12em] uppercase border hair bg-blue/[0.06] text-blue px-2 py-0.5">${n.category}</span>
+                  <span class="font-mono text-xs text-ink/45">${n.no}</span>
+                </div>
+                <h1 class="font-display text-4xl md:text-5xl font-bold tracking-tight">${n.title}</h1>
+                <div class="mt-6 flex flex-wrap gap-x-8 gap-y-2 font-mono text-xs text-ink/50">
+                  <span>최초 공고일자 ${n.date}</span>
+                  <span>변경일자 ${n.updated || '—'}</span>
+                </div>
+              </header>
+
+              <article class="text-ink/80 leading-relaxed">
+                ${n.bodyHtml}
+              </article>
+            `;
+
+            listEl.classList.add('hidden');
+            detailEl.classList.remove('hidden');
+            window.scrollTo(0, 0);
+            if (window.renderIcons) window.renderIcons();
+        }
+
+        function openNotice(slug) {
+            const wasDisclosure = document.getElementById('disclosure').classList.contains('active');
+            activateSection('disclosure');
+            renderDisclosure(slug || null);
+            const newHash = slug ? `#disclosure/${slug}` : '#disclosure';
+            if (newHash !== window.location.hash) {
+                history.pushState(null, '', newHash);
             }
             revealCheck();
+            setMenu(false);
         }
+        window.openNotice = openNotice;
 
-        /* 뒤로/앞으로 가기 */
-        window.addEventListener('popstate', (e) => {
-            const st = e.state;
-            if (st && st.id) {
-                switchSection(st.id, st.navKey, st.anchorId, true);
-            } else {
-                const hid = (location.hash || '#home').slice(1);
-                const id = document.getElementById(hid) ? hid : 'home';
-                switchSection(id, NAV_OF[id] ?? null, null, true);
+        function switchSection(id, navKey) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById(id);
+            if (!target) return;
+            target.classList.add('active');
+            window.scrollTo(0, 0);
+
+            if (('#' + id) !== window.location.hash) {
+                history.pushState(null, '', '#' + id);
             }
-        });
 
-        /* 첫 진입 시 주소(#섹션) 복원 + 기준 히스토리 설정 */
-        (function initFromHash() {
-            const hid = (location.hash || '').slice(1);
-            if (hid && document.getElementById(hid) && hid !== 'home') {
-                switchSection(hid, NAV_OF[hid] ?? null, null, true);
-                history.replaceState({ id: hid, navKey: NAV_OF[hid] ?? null, anchorId: null }, '', '#' + hid);
-            } else {
-                history.replaceState({ id: 'home', navKey: null, anchorId: null }, '', '#home');
-            }
-        })();
+            if (id === 'disclosure') renderDisclosure(null);
 
-        /* ---------- 서비스 드롭다운 ---------- */
-        const servicesBtn = document.getElementById('servicesBtn');
-        const servicesMenu = document.getElementById('servicesMenu');
-        function toggleDropdown(e) {
-            if (e) e.stopPropagation();
-            const open = servicesMenu.classList.toggle('open');
-            servicesBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            revealCheck();
+            if (window.renderIcons) window.renderIcons();
+
+            setMenu(false);
         }
-        function closeDropdown() {
-            if (!servicesMenu) return;
-            servicesMenu.classList.remove('open');
-            servicesBtn.setAttribute('aria-expanded', 'false');
-        }
-        document.addEventListener('click', e => { if (!e.target.closest('.dropdown')) closeDropdown(); });
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') { closeDropdown(); closeMenu(); }
-        });
+        window.switchSection = switchSection;
 
-        /* ---------- 모바일 메뉴 ---------- */
-        const navMenu = document.getElementById('navMenu');
-        const hamburger = document.querySelector('.hamburger');
+        function setMenu(open) {
+            document.getElementById('mobile-nav').classList.toggle('translate-x-full', !open);
+            document.getElementById('menuBtn').setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
         function toggleMenu() {
-            const open = navMenu.classList.toggle('open');
-            hamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
+            const closed = document.getElementById('mobile-nav').classList.contains('translate-x-full');
+            setMenu(closed);
         }
-        function closeMenu() {
-            navMenu.classList.remove('open');
-            hamburger?.setAttribute('aria-expanded', 'false');
+        window.toggleMenu = toggleMenu;
+
+        function activateSection(secId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById(secId);
+            if (!target) return false;
+            target.classList.add('active');
+            return true;
         }
 
-        /* 로고 키보드 접근 */
-        document.querySelector('.logo')?.addEventListener('keydown', e => {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); switchSection('home', null); }
+        function initFromHash() {
+            const hash = (window.location.hash || '').substring(1);
+            const [secId, sub] = hash.split('/');
+            if (secId && document.getElementById(secId)) {
+                activateSection(secId);
+                if (secId === 'disclosure') renderDisclosure(sub || null);
+                else window.scrollTo(0, 0);
+                revealCheck();
+                if (window.renderIcons) window.renderIcons();
+            } else {
+                switchSection('home', 'home');
+            }
+        }
+
+        window.addEventListener('popstate', () => {
+            const hash = (window.location.hash || '').substring(1) || 'home';
+            const [secId, sub] = hash.split('/');
+            if (document.getElementById(secId)) {
+                activateSection(secId);
+                if (secId === 'disclosure') {
+                    renderDisclosure(sub || null);
+                } else {
+                    window.scrollTo(0, 0);
+                }
+                revealCheck();
+                if (window.renderIcons) window.renderIcons();
+                setMenu(false);
+            }
         });
 
-        /* ---------- 스크롤 등장 애니메이션 ---------- */
-        const io = ('IntersectionObserver' in window)
-            ? new IntersectionObserver((entries) => {
-                entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in-view'); io.unobserve(en.target); } });
-              }, { threshold: 0.12 })
-            : null;
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+
         function revealCheck() {
-            document.querySelectorAll('.reveal:not(.in-view)').forEach(el => {
-                if (!io) { el.classList.add('in-view'); return; }
-                const r = el.getBoundingClientRect();
-                if (r.top < window.innerHeight * 0.92) el.classList.add('in-view');
-                else io.observe(el);
+            document.querySelectorAll('.reveal').forEach(el => {
+                if (prefersReduced) { el.classList.add('in-view'); return; }
+                revealObserver.observe(el);
             });
         }
-        revealCheck();
 
-        /* ---------- 문의 폼 전송 (Vercel 서버리스 /api/contact 경유) ---------- */
         async function submitContact(e) {
             e.preventDefault();
             const form = e.target;
-            const btn = form.querySelector('.submit-btn');
-            const statusEl = document.getElementById('formStatus');
-            statusEl.className = 'form-status';
-            statusEl.textContent = '';
+            const btn = document.getElementById('submitBtn');
+            const status = document.getElementById('formStatus');
+
             btn.disabled = true;
-            const orig = btn.textContent;
-            btn.textContent = '전송 중...';
+            btn.innerHTML = '전송 중 <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>';
+            if (window.renderIcons) window.renderIcons();
 
             try {
                 const res = await fetch('/api/contact', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        subject: form.subject.value.trim(),
-                        message: form.message.value.trim(),
+                        subject: form.subject.value,
+                        message: form.message.value,
                         botcheck: form.botcheck.value
                     })
                 });
-                const data = await res.json().catch(() => ({}));
-                if (res.ok && data.success) {
-                    statusEl.className = 'form-status success';
-                    statusEl.textContent = '✅ 문의가 정상적으로 전송되었습니다. 빠르게 답변드리겠습니다.';
+                const data = await res.json();
+                if (data.success) {
+                    status.textContent = '문의가 전송되었습니다.';
+                    status.className = 'text-center text-sm font-medium pt-1 text-blue';
                     form.reset();
                 } else {
-                    statusEl.className = 'form-status error';
-                    statusEl.textContent = '⚠️ ' + (data.message || '전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+                    throw new Error(data.message || '전송에 실패했습니다.');
                 }
             } catch (err) {
-                statusEl.className = 'form-status error';
-                statusEl.textContent = '⚠️ 네트워크 오류로 전송하지 못했습니다. trobai@trobai.com 으로 보내주세요.';
+                status.textContent = err.message;
+                status.className = 'text-center text-sm font-medium pt-1 text-[#dc2626]';
             } finally {
                 btn.disabled = false;
-                btn.textContent = orig;
+                btn.innerHTML = '보내기 <i data-lucide="send" class="w-4 h-4"></i>';
+                if (window.renderIcons) window.renderIcons();
             }
         }
+        window.submitContact = submitContact;
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => { initFromHash(); revealCheck(); });
+        } else {
+            initFromHash(); revealCheck();
+        }
+        window.addEventListener('load', revealCheck);
     </script>
 </body>
 </html>
