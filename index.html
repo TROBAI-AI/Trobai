@@ -3,9 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trobai · Neural-Symbolic AI Tech Studio</title>
-    <meta name="description" content="Trobai는 KAIST 박사 연구진이 설립한 AI 딥테크 스튜디오입니다. Neuro-Symbolic AI 기술로 여행의 지능 레이어를 만듭니다. 첫 결과물 AirNotte.">
+    <title>Trobai General Solver · 언어로 묻고, 검증된 답을 받는다</title>
+    <meta name="description" content="Trobai General Solver는 현장의 말을 그대로 받아 최적화 문제로 옮기고, 독립 검증을 통과한 해만 내놓는 Neuro-Symbolic AI 실행 엔진입니다. 제조 스케줄링·물류 배차·인력 배치에 적용됩니다.">
     <link rel="icon" type="image/png" href="./img/logo.png">
+    <link rel="canonical" href="https://www.trobai.com/">
+
+    <!-- 공유 카드 (카카오톡·링크드인·슬랙 등) -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Trobai">
+    <meta property="og:locale" content="ko_KR">
+    <meta property="og:url" content="https://www.trobai.com/">
+    <meta property="og:title" content="Trobai General Solver · 언어로 묻고, 검증된 답을 받는다">
+    <meta property="og:description" content="현장의 말을 그대로 받아 최적화 문제로 옮기고, 독립 검증을 통과한 해만 내놓는 Neuro-Symbolic AI 실행 엔진.">
+    <meta property="og:image" content="https://www.trobai.com/img/demo-vro-poster.jpg">
+    <meta property="og:image:width" content="1152">
+    <meta property="og:image:height" content="720">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Trobai General Solver · 언어로 묻고, 검증된 답을 받는다">
+    <meta name="twitter:description" content="현장의 말을 그대로 받아 최적화 문제로 옮기고, 독립 검증을 통과한 해만 내놓는 Neuro-Symbolic AI 실행 엔진.">
+    <meta name="twitter:image" content="https://www.trobai.com/img/demo-vro-poster.jpg">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,6 +64,30 @@
           box-shadow: 0 0 0 1px rgba(255,90,31,0.45), 0 0 26px -6px rgba(255,90,31,0.55);
         }
 
+        /* 스크린리더 전용 텍스트 (Tailwind CDN sr-only 보강) */
+        .sr-only {
+          position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+          overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0;
+        }
+        /* 가로 스크롤 표 컨테이너 — 키보드 포커스 가시화 (Safari는 자동 포커스 안 됨) */
+        [role="region"][tabindex="0"]:focus-visible { outline: 2px solid #1E40FF; outline-offset: 2px; }
+        .vid:focus-visible { outline: 2px solid #1E40FF; outline-offset: 2px; }
+
+        /* Video facade — poster until clicked, no YouTube JS on first paint */
+        .vid { position: relative; aspect-ratio: 16 / 9; background: #000; cursor: pointer; display: block; width: 100%; border: 0; padding: 0; }
+        .vid img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: .82; transition: opacity .35s; }
+        .vid:hover img, .vid:focus-visible img { opacity: 1; }
+        .vid iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+        .vid-play {
+          position: absolute; inset: 0; margin: auto;
+          width: 64px; height: 64px; border-radius: 999px;
+          background: rgba(11,14,20,0.72); backdrop-filter: blur(2px);
+          display: flex; align-items: center; justify-content: center;
+          color: #FAFAF8; pointer-events: none;
+          box-shadow: 0 0 0 1px rgba(250,250,248,0.25);
+        }
+        .vid:hover .vid-play { background: #1E40FF; }
+
         ::-webkit-scrollbar { width: 10px; }
         ::-webkit-scrollbar-track { background: #FAFAF8; }
         ::-webkit-scrollbar-thumb { background: #d8d8d2; }
@@ -57,8 +97,10 @@
         /* Print: only the open notice document, black-on-white, no chrome */
         @media print {
           header, footer, .no-print, #disclosure-list, .section:not(.active) { display: none !important; }
-          #disclosure.section { display: block !important; }
-          #disclosure-detail { display: block !important; }
+          /* 공시 상세를 열어둔 상태(body.printing-notice)에서만 강제 표시.
+             홈 등 다른 화면에서 인쇄할 때 공시 섹션이 딸려 나와 빈 페이지가 생기던 문제 방지 */
+          body.printing-notice #disclosure.section { display: block !important; }
+          body.printing-notice #disclosure-detail { display: block !important; }
           body { background: #fff !important; }
           #disclosure-detail, #disclosure-detail * { color: #000 !important; }
           #disclosure-detail .disclosure-badge { border-color: #000 !important; background: transparent !important; }
@@ -82,25 +124,25 @@
                         서비스 <i data-lucide="chevron-down" class="w-4 h-4"></i>
                     </button>
                     <div class="absolute top-full -left-4 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-150">
-                        <div class="bg-paper border hair shadow-xl p-2 w-56">
+                        <div class="bg-paper border hair shadow-xl p-2 w-60">
+                            <button onclick="switchSection('home','home')" class="flex items-center gap-3 w-full p-3 hover:bg-ink/[0.04] transition-colors text-left">
+                                <span class="w-8 h-8 bg-ink flex items-center justify-center text-paper shrink-0">
+                                    <i data-lucide="cpu" class="w-4 h-4"></i>
+                                </span>
+                                <span>
+                                    <span class="block font-bold text-ink text-sm">General Solver</span>
+                                    <span class="block font-mono text-[10px] tracking-wide text-ink/40">NSAi EXECUTION ENGINE</span>
+                                </span>
+                            </button>
                             <button onclick="switchSection('airnotte','services')" class="flex items-center gap-3 w-full p-3 hover:bg-ink/[0.04] transition-colors text-left">
                                 <span class="w-8 h-8 bg-ink flex items-center justify-center text-paper shrink-0">
                                     <i data-lucide="navigation" class="w-4 h-4"></i>
                                 </span>
                                 <span>
                                     <span class="block font-bold text-ink text-sm">AirNotte</span>
-                                    <span class="block font-mono text-[10px] tracking-wide text-ink/40">AI TRAVEL PLANNER</span>
+                                    <span class="block font-mono text-[10px] tracking-wide text-ink/40">적용 사례 · 관광</span>
                                 </span>
                             </button>
-                            <div class="flex items-center gap-3 p-3 opacity-45 cursor-default">
-                                <span class="w-8 h-8 bg-ink/10 flex items-center justify-center text-ink shrink-0">
-                                    <i data-lucide="sparkles" class="w-4 h-4"></i>
-                                </span>
-                                <span>
-                                    <span class="block font-bold text-ink text-sm">다음 제품</span>
-                                    <span class="block font-mono text-[10px] tracking-wide text-ink/40">준비중</span>
-                                </span>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -115,7 +157,7 @@
     </header>
 
     <!-- Mobile Nav -->
-    <div id="mobile-nav" class="fixed inset-0 z-40 bg-paper translate-x-full transition-transform duration-300 md:hidden">
+    <div id="mobile-nav" inert aria-hidden="true" class="fixed inset-0 z-40 bg-paper translate-x-full transition-transform duration-300 md:hidden">
         <div class="p-8 pt-24 flex flex-col gap-2 text-2xl font-display font-bold tracking-tight">
             <button class="py-3 text-left border-b hair" onclick="switchSection('home','home')">홈</button>
             <button class="py-3 text-left border-b hair" onclick="switchSection('about','about')">회사소개</button>
@@ -138,20 +180,20 @@
                     <div class="lg:col-span-7 reveal">
                         <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-8 flex items-center gap-3">
                             <span class="inline-block w-8 h-px bg-blue"></span>
-                            NEURAL · SYMBOLIC AI
+                            GENERAL SOLVER · NSAi ENGINE
                         </div>
                         <h1 class="font-display text-5xl sm:text-6xl md:text-7xl xl:text-8xl font-bold tracking-tight leading-[0.98]">
-                            여행의 지능<br>레이어를<br><span class="text-blue">만듭니다</span>
+                            언어로 묻고,<br>검증된 답을<br><span class="text-blue">받는다</span>
                         </h1>
                         <p class="mt-10 text-lg md:text-xl text-ink/65 leading-relaxed max-w-xl">
-                            KAIST 연구진이 만든 AI 딥테크 스튜디오 — 그 첫 번째 결과물, AirNotte.
+                            현장의 말을 그대로 받아 최적화 문제로 옮기고, 독립 검증을 통과한 해만 내놓는 Neuro-Symbolic AI 실행 엔진입니다.
                         </p>
                         <div class="mt-10 flex flex-wrap gap-3">
-                            <button onclick="switchSection('airnotte','services')" class="group px-7 py-4 bg-ink text-paper font-medium hover:bg-blue transition-colors flex items-center gap-2">
-                                AirNotte 보기 <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-0.5 transition-transform"></i>
-                            </button>
+                            <a href="#demo" onclick="scrollToId(event,'demo')" class="group px-7 py-4 bg-ink text-paper font-medium hover:bg-blue transition-colors flex items-center gap-2">
+                                실제 동작 보기 <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-0.5 transition-transform"></i>
+                            </a>
                             <button onclick="switchSection('contact','contact')" class="px-7 py-4 border hair font-medium text-ink hover:bg-ink hover:text-paper transition-colors">
-                                문의하기
+                                도입 문의
                             </button>
                         </div>
                     </div>
@@ -168,39 +210,39 @@
                                 <div class="flex items-center gap-3">
                                     <span class="font-mono text-[10px] text-blue w-7 shrink-0">01</span>
                                     <div class="flex-1 border hair px-4 py-3 bg-paper">
-                                        <div class="text-sm font-semibold text-ink">자연어</div>
-                                        <div class="font-mono text-[10px] text-ink/40 tracking-wide">NATURAL LANGUAGE</div>
+                                        <div class="text-sm font-semibold text-ink">Brain — 현장의 말을 번역</div>
+                                        <div class="font-mono text-[10px] text-ink/40 tracking-wide">EXAONE FINE-TUNED</div>
                                     </div>
                                 </div>
                                 <div class="pl-[1.15rem]"><div class="w-px h-3 bg-hair"></div></div>
                                 <div class="flex items-center gap-3">
                                     <span class="font-mono text-[10px] text-blue w-7 shrink-0">02</span>
                                     <div class="flex-1 border hair px-4 py-3 bg-paper">
-                                        <div class="text-sm font-semibold text-ink">조건 구조화</div>
-                                        <div class="font-mono text-[10px] text-ink/40 tracking-wide">CONSTRAINTS</div>
+                                        <div class="text-sm font-semibold text-ink">Tool — 솔버가 계산</div>
+                                        <div class="font-mono text-[10px] text-ink/40 tracking-wide">MILP · CP-SAT · ALNS</div>
                                     </div>
                                 </div>
                                 <div class="pl-[1.15rem]"><div class="w-px h-3 bg-hair"></div></div>
                                 <div class="flex items-center gap-3">
                                     <span class="font-mono text-[10px] text-blue w-7 shrink-0">03</span>
-                                    <div class="flex-1 border hair px-4 py-3 bg-paper">
-                                        <div class="text-sm font-semibold text-ink">최적화</div>
-                                        <div class="font-mono text-[10px] text-ink/40 tracking-wide">OPTIMIZE</div>
+                                    <div class="flex-1 border-2 border-blue px-4 py-3 bg-paper">
+                                        <div class="text-sm font-semibold text-ink">Verification — 독립 체커가 재판정</div>
+                                        <div class="font-mono text-[10px] text-blue tracking-wide">INDEPENDENT CHECKER</div>
                                     </div>
                                 </div>
-                                <div class="pl-[1.15rem]"><div class="w-px h-3 bg-hair"></div></div>
-                                <div class="flex items-center gap-3">
-                                    <span class="font-mono text-[10px] text-blue w-7 shrink-0">04</span>
-                                    <div class="flex-1 border hair px-4 py-3 bg-paper">
-                                        <div class="text-sm font-semibold text-ink">검증</div>
-                                        <div class="font-mono text-[10px] text-ink/40 tracking-wide">VERIFY</div>
+                                <div class="flex items-center gap-3 pt-1">
+                                    <span class="w-7 shrink-0"></span>
+                                    <div class="flex-1 font-mono text-[10px] tracking-wide text-ink/45 flex items-center gap-2">
+                                        <i data-lucide="repeat" class="w-3.5 h-3.5 text-blue"></i>
+                                        위반 시 자동 복구 후 재검증 — 통과할 때까지
                                     </div>
                                 </div>
                             </div>
-                            <!-- screenshot peeking at lower edge -->
+                            <!-- route map peeking at lower edge -->
                             <div class="mt-7 -mb-px border-t hair pt-6">
+                                <div class="font-mono text-[10px] tracking-[0.18em] text-ink/40 mb-3">배송 경로 산출 결과 · 실도로망</div>
                                 <div class="border hair border-b-0 overflow-hidden shadow-[0_-10px_40px_-20px_rgba(11,14,20,0.4)]">
-                                    <img src="./img/airnotte-route.webp" width="1100" height="692" alt="AirNotte 동선 지도 미리보기" class="w-full block translate-y-2" decoding="async">
+                                    <img src="./img/hero-routemap.jpg" width="960" height="600" alt="General Solver가 산출한 차량 5대의 배송 경로가 실제 도로망 지도 위에 색깔별로 표시된 화면" class="w-full block" decoding="async">
                                 </div>
                             </div>
                         </div>
@@ -215,7 +257,7 @@
                         <i data-lucide="award" class="w-4 h-4 text-blue mt-0.5 shrink-0"></i>
                         <div>
                             <div class="text-sm font-semibold text-ink leading-snug">관광 오픈이노베이션 1등 선정</div>
-                            <div class="font-mono text-[10px] tracking-wide text-ink/40 mt-1">문체부 · 한국관광공사</div>
+                            <div class="font-mono text-[10px] tracking-wide text-ink/40 mt-1">문화체육관광부 · 한국관광공사</div>
                         </div>
                     </div>
                     <div class="flex items-start gap-3 px-2 py-4 lg:py-2 lg:pl-8">
@@ -242,6 +284,177 @@
                 </div>
             </div>
 
+            <!-- 3.5 · THE PROBLEM -->
+            <section class="bg-paper">
+                <div class="max-w-[88rem] mx-auto px-6 py-28 md:py-36">
+                    <div class="grid lg:grid-cols-12 gap-12">
+                        <div class="lg:col-span-5 reveal">
+                            <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-6 flex items-center gap-3">
+                                <span class="inline-block w-8 h-px bg-blue"></span>
+                                THE PROBLEM
+                            </div>
+                            <h2 class="font-display text-4xl md:text-6xl font-bold tracking-tight leading-[1.02]">
+                                말로 하면 한 문장.<br><span class="text-blue">손으로 풀 수 있는</span><br>크기가 아니다.
+                            </h2>
+                            <p class="mt-8 text-lg text-ink/60 leading-relaxed max-w-md">
+                                설비 여섯 대에 작업 열여덟 건. 어느 기계에 넣을지 정하고 순서를 정하는 일입니다. 그런데 가능한 배치가 10의 20승 가지를 넘습니다.
+                            </p>
+                        </div>
+
+                        <div class="lg:col-span-7 reveal" style="transition-delay:140ms;">
+                            <!-- combinatorial explosion -->
+                            <div class="border hair bg-white p-8 md:p-10">
+                                <div class="font-mono text-[10px] tracking-[0.2em] text-ink/40 mb-4">가능한 배치 조합</div>
+                                <div class="font-display text-5xl md:text-6xl font-bold tracking-tight text-ink">10<sup class="text-3xl md:text-4xl">20</sup> <span class="text-2xl md:text-3xl font-medium text-ink/50">가지 이상</span></div>
+                                <div class="mt-7 grid sm:grid-cols-2 gap-px bg-hair border hair">
+                                    <div class="bg-paper p-5">
+                                        <div class="font-mono text-[10px] tracking-wide text-ink/45 mb-1">1초에 1억 가지씩 검토해도</div>
+                                        <div class="text-2xl font-display font-bold tracking-tight">7만 년</div>
+                                    </div>
+                                    <div class="bg-paper p-5">
+                                        <div class="font-mono text-[10px] tracking-wide text-blue mb-1">현장에 주어지는 시간</div>
+                                        <div class="text-2xl font-display font-bold tracking-tight text-blue">4시간</div>
+                                    </div>
+                                </div>
+                                <p class="mt-5 font-mono text-[10px] leading-relaxed text-ink/40">
+                                    18! × C(23,5) ≈ 2.2 × 10²⁰ — 작업 18건을 설비 6대에 분할 배정하고 각 설비 내 순서를 정하는 경우의 수 상한
+                                </p>
+                            </div>
+
+                            <!-- 5 constraints -->
+                            <div class="mt-6">
+                                <div class="font-mono text-[10px] tracking-[0.2em] text-ink/40 mb-4">게다가, 지켜야 할 규칙이 있다</div>
+                                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-hair border hair">
+                                    <div class="bg-white p-5">
+                                        <div class="font-mono text-[10px] text-blue mb-2">01 · 선후행</div>
+                                        <div class="text-sm text-ink/70 leading-relaxed">거친가공 → 정밀가공 → 검사</div>
+                                    </div>
+                                    <div class="bg-white p-5">
+                                        <div class="font-mono text-[10px] text-blue mb-2">02 · 셋업</div>
+                                        <div class="text-sm text-ink/70 leading-relaxed">품목군 변경 시 40분</div>
+                                    </div>
+                                    <div class="bg-white p-5">
+                                        <div class="font-mono text-[10px] text-blue mb-2">03 · 납기</div>
+                                        <div class="text-sm text-ink/70 leading-relaxed">오더별 마감 준수</div>
+                                    </div>
+                                    <div class="bg-white p-5">
+                                        <div class="font-mono text-[10px] text-blue mb-2">04 · 자격</div>
+                                        <div class="text-sm text-ink/70 leading-relaxed">정밀가공은 유자격자만</div>
+                                    </div>
+                                    <div class="bg-white p-5">
+                                        <div class="font-mono text-[10px] text-blue mb-2">05 · 야간</div>
+                                        <div class="text-sm text-ink/70 leading-relaxed">열처리 무인운전 금지</div>
+                                    </div>
+                                    <div class="bg-white p-5 flex items-center">
+                                        <div class="text-sm text-ink/55 leading-relaxed">규칙이 하나 늘 때마다, 조금 어려워진 문제가 아니라 <span class="text-ink font-semibold">아예 다른 문제</span>가 됩니다.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3.6 · MARKET REALITY -->
+            <section class="bg-white border-y hair">
+                <div class="max-w-[88rem] mx-auto px-6 py-24 md:py-28">
+                    <div class="reveal max-w-3xl mb-14">
+                        <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-6 flex items-center gap-3">
+                            <span class="inline-block w-8 h-px bg-blue"></span>
+                            THE REALITY
+                        </div>
+                        <h2 class="font-display text-4xl md:text-5xl font-bold tracking-tight leading-[1.05]">그래서 2026년의 공장은<br>아직도 엑셀로 계획을 짭니다</h2>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-px bg-hair border hair reveal">
+                        <div class="bg-paper p-8">
+                            <div class="font-display text-4xl md:text-5xl font-bold tracking-tight">163,273</div>
+                            <div class="text-sm text-ink/60 mt-3 leading-relaxed">공장 보유<br>중소·중견 제조기업</div>
+                        </div>
+                        <div class="bg-paper p-8">
+                            <div class="font-display text-4xl md:text-5xl font-bold tracking-tight">19.5%</div>
+                            <div class="text-sm text-ink/60 mt-3 leading-relaxed">스마트공장<br>도입률</div>
+                        </div>
+                        <div class="bg-paper p-8">
+                            <div class="font-display text-4xl md:text-5xl font-bold tracking-tight text-blue">0.1%</div>
+                            <div class="text-sm text-ink/60 mt-3 leading-relaxed">제조 AI<br>도입률</div>
+                        </div>
+                    </div>
+                    <p class="mt-8 text-lg text-ink/70 reveal">담당자가 게을러서가 아닙니다. 지금까지 <span class="text-ink font-semibold">선택지가 두 개뿐</span>이었기 때문입니다.</p>
+                    <p class="mt-3 font-mono text-[10px] tracking-wide text-ink/40 reveal">출처 · 중소벤처기업부 · 스마트제조혁신추진단, 제1차 스마트제조혁신 실태조사 (2025.4)</p>
+                </div>
+            </section>
+
+            <!-- 3.7 · TWO ROADS -->
+            <section class="bg-paper">
+                <div class="max-w-[88rem] mx-auto px-6 py-28 md:py-36">
+                    <div class="reveal max-w-3xl mb-14">
+                        <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-6 flex items-center gap-3">
+                            <span class="inline-block w-8 h-px bg-blue"></span>
+                            TWO ROADS
+                        </div>
+                        <h2 class="font-display text-4xl md:text-5xl font-bold tracking-tight leading-[1.05]">지금까지의 선택지 두 개</h2>
+                    </div>
+
+                    <div class="grid lg:grid-cols-2 gap-px bg-hair border hair reveal">
+                        <!-- road A -->
+                        <div class="bg-white p-8 md:p-10 min-w-0">
+                            <div class="font-mono text-[10px] tracking-[0.2em] text-ink/40 mb-5">길 A</div>
+                            <h3 class="font-display text-2xl md:text-3xl font-bold tracking-tight">범용 LLM에게 묻는다</h3>
+                            <p class="mt-4 text-ink/60 leading-relaxed">말은 통합니다. 표도 나오고 설명까지 붙습니다. 여기까지만 보면 문제가 풀린 것처럼 보입니다.</p>
+                            <div class="mt-7 font-mono text-[10px] tracking-[0.18em] text-ink/40 mb-3">그런데 검증해보면 — 제약 위반 6건, 그중 3건</div>
+                            <ul class="space-y-px bg-hair border hair">
+                                <li class="bg-paper px-5 py-4 flex items-start gap-3">
+                                    <i data-lucide="ban" class="w-4 h-4 text-[#dc2626] mt-0.5 shrink-0"></i>
+                                    <div><span class="text-sm font-semibold">작업 #3</span><span class="text-sm text-ink/60"> — 선행 공정 미완료 상태에서 시작 <span class="font-mono text-[10px] text-ink/40">제약 ① 위반</span></span></div>
+                                </li>
+                                <li class="bg-paper px-5 py-4 flex items-start gap-3">
+                                    <i data-lucide="ban" class="w-4 h-4 text-[#dc2626] mt-0.5 shrink-0"></i>
+                                    <div><span class="text-sm font-semibold">작업 #5</span><span class="text-sm text-ink/60"> — 무자격 작업자 배정 <span class="font-mono text-[10px] text-ink/40">제약 ④ 위반</span></span></div>
+                                </li>
+                                <li class="bg-paper px-5 py-4 flex items-start gap-3">
+                                    <i data-lucide="ban" class="w-4 h-4 text-[#dc2626] mt-0.5 shrink-0"></i>
+                                    <div><span class="text-sm font-semibold">작업 #7</span><span class="text-sm text-ink/60"> — 납기 2일 초과 <span class="font-mono text-[10px] text-ink/40">제약 ③ 위반</span></span></div>
+                                </li>
+                            </ul>
+                            <p class="mt-6 text-ink font-semibold leading-relaxed">그리고 답변 어디에도, 그런 말은 없었습니다.</p>
+                            <p class="mt-3 text-sm text-ink/55 leading-relaxed">문제는 틀렸다는 게 아닙니다. 현장에서 <span class="text-ink font-semibold">틀렸다는 걸 알 방법이 없다</span>는 겁니다.</p>
+                        </div>
+
+                        <!-- road B -->
+                        <div class="bg-white p-8 md:p-10 min-w-0">
+                            <div class="font-mono text-[10px] tracking-[0.2em] text-ink/40 mb-5">길 B</div>
+                            <h3 class="font-display text-2xl md:text-3xl font-bold tracking-tight">최적화 솔버를 도입한다</h3>
+                            <p class="mt-4 text-ink/60 leading-relaxed">답이 정확합니다. 제약도 다 지킵니다. 대신 현장의 규칙을 전부 수식으로 옮겨 적을 사람이 필요합니다.</p>
+                            <div class="mt-7 font-mono text-[10px] tracking-[0.18em] text-ink/40 mb-3">대가</div>
+                            <div class="grid grid-cols-2 gap-px bg-hair border hair">
+                                <div class="bg-paper p-5">
+                                    <div class="text-2xl font-display font-bold tracking-tight">300줄 이상</div>
+                                    <div class="font-mono text-[10px] text-ink/45 mt-1">제약 정의 코드</div>
+                                </div>
+                                <div class="bg-paper p-5">
+                                    <div class="text-2xl font-display font-bold tracking-tight">3명 × 4개월</div>
+                                    <div class="font-mono text-[10px] text-ink/45 mt-1">요구사항 → 모델링 → 튜닝 → 검증</div>
+                                </div>
+                            </div>
+                            <p class="mt-6 text-ink font-semibold leading-relaxed">현장 규칙 1건이 바뀌면, 다시 처음부터입니다.</p>
+                            <p class="mt-3 text-sm text-ink/55 leading-relaxed">그리고 공장의 규칙은, 매달 바뀝니다.</p>
+                            <p class="mt-6 font-mono text-[10px] tracking-wide text-ink/40 leading-relaxed">
+                                스마트공장 도입 평균 비용 11억 3천만 원 · 중소기업 7억 5천만 원<br>(중소벤처기업부 실태조사, 2025.4)
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- the gap -->
+                    <div class="mt-10 border hair bg-ink text-paper p-10 md:p-14 reveal">
+                        <div class="font-mono text-[10px] tracking-[0.2em] text-blue mb-5">비어 있는 자리</div>
+                        <p class="font-display text-2xl md:text-4xl font-bold tracking-tight leading-[1.25]">
+                            쓰기 쉬운 쪽은 믿을 수 없고,<br>믿을 수 있는 쪽은 쓸 수가 없다.
+                        </p>
+                        <p class="mt-6 text-paper/55 text-lg">그래서 우리는 그 빈자리를 채웁니다.</p>
+                    </div>
+                </div>
+            </section>
+
             <!-- 4 · THE ENGINE — DARK ZONE (full bleed) -->
             <section class="bg-ink text-paper">
                 <div class="max-w-[88rem] mx-auto px-6 py-28 md:py-36">
@@ -252,60 +465,653 @@
                                 THE ENGINE
                             </div>
                             <h2 class="font-display text-4xl md:text-6xl font-bold tracking-tight leading-[1.02]">
-                                Neural <span class="text-white/30">+</span> Symbolic<br>= <span class="text-blue">NSAi</span>
+                                세 개의 층으로<br>되어 있습니다
                             </h2>
                             <p class="mt-8 text-lg text-paper/55 leading-relaxed max-w-md">
-                                LLM의 유연함에 기호 추론기의 엄격함을 결합합니다. 그럴듯한 답이 아니라, 수학적으로 검증된 해법을 내놓습니다.
+                                LLM이 답을 지어내는 게 아니라, 검증된 솔버가 계산하고 독립 체커가 다시 판정합니다. Neural <span class="text-white/40">+</span> Symbolic <span class="text-white/40">=</span> <span class="text-blue font-semibold">NSAi</span>.
                             </p>
                         </div>
 
-                        <!-- 4-step pipeline as labelled architecture nodes -->
+                        <!-- 3-layer architecture -->
                         <div class="lg:col-span-7 reveal" style="transition-delay:140ms;">
-                            <div class="grid sm:grid-cols-2 gap-px bg-white/10 border border-white/10">
+                            <div class="font-mono text-[10px] tracking-[0.2em] text-paper/40 mb-3">자연어 입력</div>
+                            <div class="grid sm:grid-cols-3 gap-px bg-white/10 border border-white/10">
                                 <div class="bg-ink p-7 relative">
                                     <div class="absolute top-3 left-3 w-1.5 h-1.5 rounded-full bg-blue node-glow"></div>
                                     <div class="font-mono text-blue text-xs mb-5 tracking-widest">01</div>
-                                    <h4 class="text-lg font-semibold mb-2">조건 구조화</h4>
-                                    <p class="text-sm text-paper/50 leading-relaxed">자연어 입력을 구조화된 논리 제약으로 변환해 의도를 명확히 합니다.</p>
+                                    <h3 class="text-lg font-semibold mb-1">Brain</h3>
+                                    <div class="font-mono text-[10px] tracking-wide text-paper/40 mb-3">EXAONE 파인튜닝</div>
+                                    <p class="text-sm text-paper/50 leading-relaxed">현장의 말을 정형 최적화 문제로 번역합니다.</p>
                                 </div>
                                 <div class="bg-ink p-7 relative">
                                     <div class="absolute top-3 left-3 w-1.5 h-1.5 rounded-full bg-blue node-glow"></div>
                                     <div class="font-mono text-blue text-xs mb-5 tracking-widest">02</div>
-                                    <h4 class="text-lg font-semibold mb-2">최적화 계산</h4>
-                                    <p class="text-sm text-paper/50 leading-relaxed">수만 개의 제약을 동시에 만족하는 최적 경로를 수학적으로 연산합니다.</p>
+                                    <h3 class="text-lg font-semibold mb-1">Tool</h3>
+                                    <div class="font-mono text-[10px] tracking-wide text-paper/40 mb-3">MILP · CP-SAT · ALNS</div>
+                                    <p class="text-sm text-paper/50 leading-relaxed">결정론적 솔버가 계산합니다. LLM이 답을 지어내지 않습니다.</p>
                                 </div>
                                 <div class="bg-ink p-7 relative">
                                     <div class="absolute top-3 left-3 w-1.5 h-1.5 rounded-full bg-blue node-glow"></div>
                                     <div class="font-mono text-blue text-xs mb-5 tracking-widest">03</div>
-                                    <h4 class="text-lg font-semibold mb-2">실시간 검증</h4>
-                                    <p class="text-sm text-paper/50 leading-relaxed">운영 데이터와 대조해 실행 가능성을 0.1초 단위로 검증합니다.</p>
-                                </div>
-                                <div class="bg-ink p-7 relative">
-                                    <div class="absolute top-3 left-3 w-1.5 h-1.5 rounded-full bg-blue node-glow"></div>
-                                    <div class="font-mono text-blue text-xs mb-5 tracking-widest">04</div>
-                                    <h4 class="text-lg font-semibold mb-2">자동 리페어</h4>
-                                    <p class="text-sm text-paper/50 leading-relaxed">상황이 변하면 최소 수정으로 정합성을 유지하는 대안을 자동 생성합니다.</p>
+                                    <h3 class="text-lg font-semibold mb-1">Verification</h3>
+                                    <div class="font-mono text-[10px] tracking-wide text-paper/40 mb-3">독립 체커</div>
+                                    <p class="text-sm text-paper/50 leading-relaxed">솔버와 별도로 작성된 코드가 제약 충족을 재판정합니다.</p>
                                 </div>
                             </div>
+                            <div class="font-mono text-[10px] tracking-[0.2em] text-blue mt-3">검증 통과한 해만 출력</div>
 
-                            <!-- 3 differentiators -->
-                            <div class="mt-px grid sm:grid-cols-3 gap-px bg-white/10 border border-white/10 border-t-0">
-                                <div class="bg-ink p-6">
-                                    <i data-lucide="shield-check" class="w-5 h-5 text-blue mb-3"></i>
-                                    <div class="text-sm font-semibold">Verified Output</div>
-                                    <div class="font-mono text-[10px] tracking-wide text-paper/40 mt-1">검증된 결과만</div>
+                            <!-- Auto-Repair loop -->
+                            <div class="mt-10 border border-blue/40 bg-blue/[0.06] p-7">
+                                <div class="font-mono text-[10px] tracking-[0.2em] text-blue mb-4">AUTO-REPAIR · 여기서 우리는 다릅니다</div>
+                                <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm font-semibold">
+                                    <span>위반 감지</span>
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-blue"></i>
+                                    <span>원인 역추적</span>
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-blue"></i>
+                                    <span>해 수정</span>
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-blue"></i>
+                                    <span>재검증</span>
+                                    <span class="font-mono text-[10px] tracking-wide text-blue ml-1">↻ 통과할 때까지 자동 반복</span>
                                 </div>
-                                <div class="bg-ink p-6">
-                                    <i data-lucide="wrench" class="w-5 h-5 text-blue mb-3"></i>
-                                    <div class="text-sm font-semibold">Auto-Repair</div>
-                                    <div class="font-mono text-[10px] tracking-wide text-paper/40 mt-1">자동 복구</div>
-                                </div>
-                                <div class="bg-ink p-6">
-                                    <i data-lucide="list-checks" class="w-5 h-5 text-blue mb-3"></i>
-                                    <div class="text-sm font-semibold">Audit Log</div>
-                                    <div class="font-mono text-[10px] tracking-wide text-paper/40 mt-1">추론 감사 로그</div>
+                                <p class="mt-5 text-sm text-paper/60 leading-relaxed">
+                                    위반이 발견되면 사람에게 되묻지 않고, 어떤 제약을 왜 위반했는지 역추적해 해를 고칩니다.
+                                    <span class="text-paper font-semibold">"고쳤다"는 주장만으로는 인정하지 않습니다</span> — 반드시 체커를 다시 통과해야 합니다.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4.5 · WHY YOU CAN TRUST IT — 5 mechanisms -->
+            <section class="bg-paper border-t hair">
+                <div class="max-w-[88rem] mx-auto px-6 py-28 md:py-36">
+                    <div class="reveal max-w-3xl mb-16">
+                        <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-6 flex items-center gap-3">
+                            <span class="inline-block w-8 h-px bg-blue"></span>
+                            WHY YOU CAN TRUST IT
+                        </div>
+                        <h2 class="font-display text-4xl md:text-5xl font-bold tracking-tight leading-[1.05]">"검증한다"는 말의 실체</h2>
+                        <p class="mt-8 text-lg text-ink/65 leading-relaxed">검증한다는 말은 그 자체로는 공허합니다. 우리가 실제로 무엇을 어떻게 하는지 다섯 가지로 밝힙니다.</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-px bg-hair border hair reveal">
+                        <!-- T1 -->
+                        <div class="bg-white p-8 md:p-10 min-w-0">
+                            <div class="font-mono text-[10px] tracking-[0.2em] text-blue mb-4">01 · 독립성</div>
+                            <h3 class="font-display text-xl md:text-2xl font-bold tracking-tight mb-4">솔버와 체커를 따로 만듭니다</h3>
+                            <div class="flex flex-wrap items-center gap-2 text-xs font-mono mb-5">
+                                <span class="border hair px-3 py-2 bg-paper">솔버<br><span class="text-ink/40">MILP · CP-SAT · ALNS</span></span>
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-blue"></i>
+                                <span class="border hair px-3 py-2 bg-paper">해<br><span class="text-ink/40">변수 할당</span></span>
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-blue"></i>
+                                <span class="border-2 border-blue px-3 py-2 bg-paper">체커<br><span class="text-blue">원본 데이터로 독립 재계산</span></span>
+                            </div>
+                            <p class="text-ink/60 leading-relaxed text-sm">
+                                체커는 어떤 알고리즘이 풀었는지 모릅니다. 원본 문제 데이터와 나온 답만 받아서 모든 제약을 처음부터 다시 계산합니다.
+                                코드를 따로 썼기 때문에 <span class="text-ink font-semibold">두 코드가 같은 실수를 할 이유가 없습니다.</span>
+                            </p>
+                            <p class="mt-4 font-mono text-[10px] tracking-wide text-ink/40">ALGORITHM-AGNOSTIC — 어떤 솔버가 풀었든 같은 체커가 판정합니다</p>
+                        </div>
+
+                        <!-- T2 -->
+                        <div class="bg-white p-8 md:p-10 min-w-0">
+                            <div class="font-mono text-[10px] tracking-[0.2em] text-blue mb-4">02 · 보장 등급</div>
+                            <h3 class="font-display text-xl md:text-2xl font-bold tracking-tight mb-4">무엇을 보장하는지 구분해서 말합니다</h3>
+                            <ul class="space-y-px bg-hair border hair mb-5">
+                                <li class="bg-paper px-5 py-4">
+                                    <div class="font-mono text-xs text-blue">exact_optimal</div>
+                                    <div class="text-sm font-semibold mt-1">증명된 전역 최적</div>
+                                    <div class="text-xs text-ink/55 mt-1">더 나은 답이 존재하지 않음을 수학적으로 증명</div>
+                                </li>
+                                <li class="bg-paper px-5 py-4">
+                                    <div class="font-mono text-xs text-blue">feasible_best_found</div>
+                                    <div class="text-sm font-semibold mt-1">최선의 실행가능해</div>
+                                    <div class="text-xs text-ink/55 mt-1">제약은 모두 만족 · 최적 증명은 없음</div>
+                                </li>
+                                <li class="bg-paper px-5 py-4 opacity-60">
+                                    <div class="font-mono text-xs text-ink/50">agent_generated</div>
+                                    <div class="text-sm font-semibold mt-1">사용자 화면에 표시하지 않음</div>
+                                    <div class="text-xs text-ink/55 mt-1">실험 단계</div>
+                                </li>
+                            </ul>
+                            <p class="text-ink/60 leading-relaxed text-sm"><span class="text-ink font-semibold">휴리스틱이 푼 답을 "최적"이라고 말하지 않습니다.</span></p>
+                        </div>
+
+                        <!-- T3 -->
+                        <div class="bg-white p-8 md:p-10 min-w-0">
+                            <div class="font-mono text-[10px] tracking-[0.2em] text-blue mb-4">03 · 근거 강제</div>
+                            <h3 class="font-display text-xl md:text-2xl font-bold tracking-tight mb-4">숫자마다 출처를 강제합니다</h3>
+                            <div class="border hair bg-paper p-5 mb-5">
+                                <div class="font-mono text-[10px] tracking-wide text-ink/40 mb-2">사용자 원문</div>
+                                <div class="text-sm text-ink/80">"품목군 바뀌면 <span class="bg-blue/15 text-blue font-semibold px-1">셋업 40분</span> 잡아줘"</div>
+                                <div class="mt-4 flex items-center gap-2 text-xs font-mono">
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-blue"></i>
+                                    <span class="text-ink/80">setup_time = 40</span>
+                                    <span class="text-blue">근거 span 있음 ✓ 채택</span>
                                 </div>
                             </div>
+                            <p class="text-ink/60 leading-relaxed text-sm">
+                                근거가 없는 값은 시스템이 거부합니다. LLM이 "아마 30분쯤" 하고 채워 넣는 경로가 <span class="text-ink font-semibold">아예 없습니다.</span>
+                                모호하면 추측하지 않고 되묻습니다.
+                            </p>
+                            <p class="mt-4 font-mono text-[10px] tracking-wide text-ink/40">FAIL-CLOSED — 추측해서 틀리는 것보다 되묻는 쪽을 택합니다</p>
+                        </div>
+
+                        <!-- T4 -->
+                        <div class="bg-white p-8 md:p-10 min-w-0">
+                            <div class="font-mono text-[10px] tracking-[0.2em] text-blue mb-4">04 · 코드 생성 경로</div>
+                            <h3 class="font-display text-xl md:text-2xl font-bold tracking-tight mb-4">AI가 코드를 짜서 돌리나요?</h3>
+                            <div class="overflow-x-auto mb-5" tabindex="0" role="region" aria-label="코드 생성 경로별 처리 방식">
+                                <table class="w-full text-xs border-collapse min-w-[380px]">
+                                    <caption class="sr-only">경로별로 요청 시점에 코드를 새로 작성하는지, 결과를 사용자에게 표시하는지 정리한 표</caption>
+                                    <thead>
+                                        <tr class="border-b hair">
+                                            <th scope="col" class="text-left font-mono text-[10px] tracking-wide text-ink/45 py-2 pr-3 font-normal">경로</th>
+                                            <th scope="col" class="text-left font-mono text-[10px] tracking-wide text-ink/45 py-2 px-3 font-normal">요청 시점 코드 작성</th>
+                                            <th scope="col" class="text-left font-mono text-[10px] tracking-wide text-ink/45 py-2 pl-3 font-normal">사용자에게 표시</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-[#E6E6E1]">
+                                        <tr><th scope="row" class="py-3 pr-3 text-left font-normal">카탈로그 40여 문제군</th><td class="py-3 px-3 text-blue font-semibold">없음</td><td class="py-3 pl-3">검증 후 표시</td></tr>
+                                        <tr><th scope="row" class="py-3 pr-3 text-left font-normal">신규 문제 IR 경로</th><td class="py-3 px-3 text-blue font-semibold">없음</td><td class="py-3 pl-3">검증 후 표시</td></tr>
+                                        <tr><th scope="row" class="py-3 pr-3 text-left font-normal">graph coloring 고정 구현</th><td class="py-3 px-3 text-blue font-semibold">없음</td><td class="py-3 pl-3">검증 후 표시</td></tr>
+                                        <tr class="text-ink/50"><th scope="row" class="py-3 pr-3 text-left font-normal">실험 레인 (기본 꺼짐)</th><td class="py-3 px-3">있음</td><td class="py-3 pl-3">표시 안 됨</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="text-ink/60 leading-relaxed text-sm">
+                                기본 원칙은 언어모델이 실행 코드를 쓰지 않는 것입니다.
+                                <span class="text-ink font-semibold">요청마다 새로 쓴 코드의 결과가 "정답"으로 나가는 경로는 하나도 없습니다.</span>
+                            </p>
+                        </div>
+
+                        <!-- T5 -->
+                        <div class="bg-white p-8 md:p-10 md:col-span-2 min-w-0">
+                            <div class="font-mono text-[10px] tracking-[0.2em] text-blue mb-4">05 · 격리</div>
+                            <h3 class="font-display text-xl md:text-2xl font-bold tracking-tight mb-6">그래도 코드를 돌려야 할 때는</h3>
+                            <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-px bg-hair border hair mb-6">
+                                <div class="bg-paper p-5">
+                                    <i data-lucide="ban" class="w-4 h-4 text-blue mb-3"></i>
+                                    <div class="text-sm font-semibold">네트워크</div>
+                                    <div class="text-xs text-ink/55 mt-1 leading-relaxed">완전 차단<br><span class="text-ink/40">외부 통신 · 데이터 유출 불가</span></div>
+                                </div>
+                                <div class="bg-paper p-5">
+                                    <i data-lucide="lock" class="w-4 h-4 text-blue mb-3"></i>
+                                    <div class="text-sm font-semibold">파일시스템</div>
+                                    <div class="text-xs text-ink/55 mt-1 leading-relaxed">읽기 전용<br><span class="text-ink/40">자기 수정 · 실행파일 생성 불가</span></div>
+                                </div>
+                                <div class="bg-paper p-5">
+                                    <i data-lucide="users" class="w-4 h-4 text-blue mb-3"></i>
+                                    <div class="text-sm font-semibold">권한</div>
+                                    <div class="text-xs text-ink/55 mt-1 leading-relaxed">비특권 사용자<br><span class="text-ink/40">전 권한 제거</span></div>
+                                </div>
+                                <div class="bg-paper p-5">
+                                    <i data-lucide="cpu" class="w-4 h-4 text-blue mb-3"></i>
+                                    <div class="text-sm font-semibold">자원</div>
+                                    <div class="text-xs text-ink/55 mt-1 leading-relaxed">CPU 1코어 · 256MB · 15초<br><span class="text-ink/40">무한 루프 · 메모리 고갈 방지</span></div>
+                                </div>
+                                <div class="bg-paper p-5">
+                                    <i data-lucide="boxes" class="w-4 h-4 text-blue mb-3"></i>
+                                    <div class="text-sm font-semibold">이미지</div>
+                                    <div class="text-xs text-ink/55 mt-1 leading-relaxed">해시 고정<br><span class="text-ink/40">공급망 공격 방지</span></div>
+                                </div>
+                            </div>
+                            <p class="text-ink/70 leading-relaxed">
+                                그리고 샌드박스를 띄울 수 없으면 <span class="text-ink font-semibold">즉시 실패합니다.</span> "그냥 로컬에서 돌리자"는 폴백은 설계에 없습니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4.6 · LIVE DEMO -->
+            <section id="demo" class="bg-ink text-paper scroll-mt-16">
+                <div class="max-w-[88rem] mx-auto px-6 py-28 md:py-36">
+                    <div class="reveal max-w-3xl mb-14">
+                        <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-6 flex items-center gap-3">
+                            <span class="inline-block w-8 h-px bg-blue"></span>
+                            LIVE DEMO
+                        </div>
+                        <h2 class="font-display text-4xl md:text-6xl font-bold tracking-tight leading-[1.02]">실제 화면입니다</h2>
+                        <p class="mt-8 text-lg text-paper/55 leading-relaxed">현장의 말을 그대로 쓰고, 대화 중에 조건이 바뀌면 다시 풉니다. 실제 제품 화면을 녹화한 것입니다.</p>
+                    </div>
+
+                    <!-- primary demo -->
+                    <div class="reveal">
+                        <div class="border border-white/10 bg-black">
+                            <button type="button" class="vid" data-yt="JJhRO3u1WX0" data-start="0" onclick="playVid(this)" aria-label="배송 경로 최적화 데모 영상 재생">
+                                <img src="./img/demo-vro-poster.jpg" width="1152" height="720" loading="lazy" decoding="async" alt="배송 경로 데모 — 차량 5대의 경로가 서울 실도로망 지도 위에 색깔별로 표시된 화면">
+                                <span class="vid-play"><i data-lucide="play" class="w-6 h-6"></i></span>
+                            </button>
+                        </div>
+                        <div class="grid lg:grid-cols-12 gap-8 mt-8">
+                            <div class="lg:col-span-5">
+                                <div class="font-mono text-[10px] tracking-[0.2em] text-blue mb-3">DEMO 01 · 배송 경로 · 2분 18초</div>
+                                <h3 class="font-display text-2xl md:text-3xl font-bold tracking-tight">"배송할 곳 15군데, 차량 5대. 제일 빠르게 도는 순서 짜주세요"</h3>
+                            </div>
+                            <div class="lg:col-span-7">
+                                <ol class="space-y-px bg-white/10 border border-white/10">
+                                    <li class="bg-ink px-5 py-4 flex gap-4">
+                                        <span class="font-mono text-[10px] text-blue shrink-0 pt-1">01</span>
+                                        <span class="text-sm text-paper/70 leading-relaxed">배송지·차량·거점 데이터를 올리고 <span class="text-paper font-semibold">평소 쓰는 말로</span> 요청합니다.</span>
+                                    </li>
+                                    <li class="bg-ink px-5 py-4 flex gap-4">
+                                        <span class="font-mono text-[10px] text-blue shrink-0 pt-1">02</span>
+                                        <span class="text-sm text-paper/70 leading-relaxed">실제 도로망 기준 경로가 나옵니다. 지도·표·엑셀까지 함께 떨어집니다.</span>
+                                    </li>
+                                    <li class="bg-ink px-5 py-4 flex gap-4">
+                                        <span class="font-mono text-[10px] text-blue shrink-0 pt-1">03</span>
+                                        <span class="text-sm text-paper/70 leading-relaxed">그리고 조건이 <span class="text-paper font-semibold">네 번 바뀝니다</span> — 냉동차 지정 2건, 기사 근무시간 09–16시, 배송 취소 1건.</span>
+                                    </li>
+                                    <li class="bg-ink px-5 py-4 flex gap-4">
+                                        <span class="font-mono text-[10px] text-blue shrink-0 pt-1">04</span>
+                                        <span class="text-sm text-paper/70 leading-relaxed">냉동차 지정처럼 기존 배정을 뒤집는 조건은 <span class="text-paper font-semibold">"적용 후보로 등록했습니다. 승인해 주시면 반영합니다"</span>라고 확인을 받은 뒤 재계산합니다.</span>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- secondary demos -->
+                    <div class="grid md:grid-cols-2 gap-8 mt-16 reveal">
+                        <div>
+                            <div class="border border-white/10 bg-black">
+                                <button type="button" class="vid" data-yt="Qg_Bzm_YpKw" data-start="0" onclick="playVid(this)" aria-label="조선소 야드 배정 데모 영상 재생">
+                                    <img src="./img/demo-shipyard-poster.jpg" width="1152" height="720" loading="lazy" decoding="async" alt="조선소 야드 배정 데모 — 선박 블록별 배정 야드와 변경 사유가 표로 정리된 화면">
+                                    <span class="vid-play"><i data-lucide="play" class="w-6 h-6"></i></span>
+                                </button>
+                            </div>
+                            <div class="font-mono text-[10px] tracking-[0.2em] text-blue mt-6 mb-2">DEMO 02 · 조선소 야드 배정 · 1분 39초</div>
+                            <h3 class="text-xl font-display font-bold tracking-tight">선박 블록 15개를 야드 10곳에</h3>
+                            <p class="mt-3 text-sm text-paper/60 leading-relaxed">
+                                용량을 지키면서 배정 비용을 최소화합니다. 이후 "3번 야드는 대형선 전용", "7번은 정비 중", "예산 미승인", "9번 블록은 금요일 마감" 네 가지 조건이 차례로 붙고,
+                                <span class="text-paper font-semibold">최종 표에는 각 변경의 사유가 비고로 남습니다.</span>
+                            </p>
+                        </div>
+                        <div>
+                            <div class="border border-white/10 bg-black">
+                                <button type="button" class="vid" data-yt="nbTITfIRGO8" data-start="7" onclick="playVid(this)" aria-label="생산 스케줄 데모 영상 재생">
+                                    <img src="./img/demo-schedule-poster.jpg" width="1092" height="720" loading="lazy" decoding="async" alt="생산 스케줄 데모 — 계산 상태와 제약 검증 통과 여부가 표로 표시된 화면">
+                                    <span class="vid-play"><i data-lucide="play" class="w-6 h-6"></i></span>
+                                </button>
+                            </div>
+                            <div class="font-mono text-[10px] tracking-[0.2em] text-blue mt-6 mb-2">DEMO 03 · 생산 스케줄 · 42초</div>
+                            <h3 class="text-xl font-display font-bold tracking-tight">모호하면, 추측하지 않고 되묻습니다</h3>
+                            <p class="mt-3 text-sm text-paper/60 leading-relaxed">
+                                공정 파일을 올리자 바로 답을 내지 않고 <span class="text-paper font-semibold">세 가지를 먼저 되묻습니다</span> — 데이터 의미, 반드시 지킬 조건, 추가 조건.
+                                결과 화면에는 계산 상태·결과 수준·제약 검증 통과 여부가 함께 표시됩니다.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 앞 '문제 정의'에서 던진 4시간에 대한 답 -->
+                    <div class="mt-16 border border-white/10 reveal">
+                        <div class="border-b border-white/10 px-7 py-4 font-mono text-[10px] tracking-[0.2em] text-paper/45">
+                            앞서 본 제조 스케줄링 문제 · 설비 6대 · 작업 18건 · 설비 1대 고장으로 재계획
+                        </div>
+                        <div class="grid grid-cols-3 gap-px bg-white/10">
+                            <div class="bg-ink p-7">
+                                <div class="font-display text-4xl md:text-5xl font-bold tracking-tight text-blue">31초</div>
+                                <div class="font-mono text-[10px] tracking-wide text-paper/45 mt-3">재계획 소요</div>
+                            </div>
+                            <div class="bg-ink p-7">
+                                <div class="font-display text-4xl md:text-5xl font-bold tracking-tight">0</div>
+                                <div class="font-mono text-[10px] tracking-wide text-paper/45 mt-3">납기 초과 건수</div>
+                            </div>
+                            <div class="bg-ink p-7">
+                                <div class="font-display text-4xl md:text-5xl font-bold tracking-tight">0</div>
+                                <div class="font-mono text-[10px] tracking-wide text-paper/45 mt-3">제약 위반</div>
+                            </div>
+                        </div>
+                        <div class="border-t border-white/10 px-7 py-6">
+                            <p class="text-lg text-paper/80 leading-relaxed">
+                                <span class="text-paper font-semibold">4시간짜리 일이 31초가 됐고, 결과는 검증까지 끝나 있습니다.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4.65 · 3-WAY 비교 -->
+            <section class="bg-white border-y hair">
+                <div class="max-w-[88rem] mx-auto px-6 py-24 md:py-28">
+                    <div class="reveal max-w-3xl mb-12">
+                        <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-6 flex items-center gap-3">
+                            <span class="inline-block w-8 h-px bg-blue"></span>
+                            3-WAY
+                        </div>
+                        <h2 class="font-display text-4xl md:text-5xl font-bold tracking-tight leading-[1.05]">같은 문제,<br>세 가지 방법</h2>
+                    </div>
+
+                    <div class="border hair bg-paper overflow-x-auto reveal" tabindex="0" role="region" aria-label="범용 LLM·상용 솔버·Trobai 3자 비교표">
+                        <table class="w-full text-sm border-collapse min-w-[680px]">
+                            <caption class="sr-only">같은 문제를 범용 LLM, 상용 솔버 도입, Trobai 세 가지 방법으로 풀었을 때 검증 근거 제시, 요구사항 변경 대응, 투입 시간과 인력을 비교한 표</caption>
+                            <thead>
+                                <tr class="border-b hair bg-white">
+                                    <th scope="col" class="text-left p-5 font-mono text-[10px] tracking-wide text-ink/45 font-normal"><span class="sr-only">비교 항목</span></th>
+                                    <th scope="col" class="text-left p-5 font-medium text-ink/70">범용 LLM</th>
+                                    <th scope="col" class="text-left p-5 font-medium text-ink/70">상용 솔버 도입</th>
+                                    <th scope="col" class="text-left p-5 font-display font-bold text-blue">Trobai</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#E6E6E1]">
+                                <tr>
+                                    <th scope="row" class="p-5 font-medium text-left">제약 위반 건수</th>
+                                    <td class="p-5 font-semibold text-[#dc2626]">6건</td>
+                                    <td class="p-5 text-ink/70">0건</td>
+                                    <td class="p-5 text-ink/80 font-semibold">0건</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" class="p-5 font-medium text-left">검증 근거 제시</th>
+                                    <td class="p-5 text-ink/55">없음</td>
+                                    <td class="p-5 text-ink/55">별도 작업</td>
+                                    <td class="p-5 text-ink/80 font-semibold">자동</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" class="p-5 font-medium text-left">요구사항 변경 대응</th>
+                                    <td class="p-5 text-ink/55">재프롬프트</td>
+                                    <td class="p-5 text-ink/55">재모델링</td>
+                                    <td class="p-5 text-ink/80 font-semibold">자연어 1줄</td>
+                                </tr>
+                                <tr class="bg-blue/[0.04]">
+                                    <th scope="row" class="p-5 font-medium text-left">투입 시간 · 인력</th>
+                                    <td class="p-5 text-ink/40">—</td>
+                                    <td class="p-5 text-ink/70 font-display text-lg font-bold">3명 × 4개월</td>
+                                    <td class="p-5 text-blue font-display text-lg font-bold">1명 × 31초</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="mt-5 font-mono text-[10px] tracking-wide text-ink/40 reveal">
+                        동일 문제 인스턴스 · 동일 프롬프트 · 2026-07-26 실행 · 10회 시도 중앙값
+                    </p>
+                    <p class="mt-8 text-lg text-ink/70 reveal">
+                        현장에서 진짜 차이가 나는 건 마지막 줄입니다 — <span class="text-ink font-semibold">전문가 세 명에 넉 달이냐, 담당자 한 명에 31초냐.</span>
+                    </p>
+                </div>
+            </section>
+
+            <!-- 4.7 · BENCHMARK -->
+            <section class="bg-paper border-t hair">
+                <div class="max-w-[88rem] mx-auto px-6 py-28 md:py-36">
+                    <div class="reveal max-w-3xl mb-14">
+                        <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-6 flex items-center gap-3">
+                            <span class="inline-block w-8 h-px bg-blue"></span>
+                            BENCHMARK
+                        </div>
+                        <h2 class="font-display text-4xl md:text-5xl font-bold tracking-tight leading-[1.05]">78개 인스턴스,<br>블라인드 테스트</h2>
+                        <p class="mt-8 text-lg text-ink/65 leading-relaxed">
+                            공개 벤치마크 22건, 실도로망 10건, 합성 46건. 이 중 10개는 최적해가 수학적으로 증명된 문제입니다.
+                            모델이 스스로 풀었다고 한 답은 믿지 않고, <span class="text-ink font-semibold">원본 데이터로 전부 다시 검증했습니다.</span>
+                        </p>
+                    </div>
+
+                    <div class="border hair bg-white overflow-x-auto reveal" tabindex="0" role="region" aria-label="모델별 벤치마크 비교표">
+                        <table class="w-full text-sm border-collapse min-w-[720px]">
+                            <caption class="sr-only">78개 인스턴스 블라인드 테스트에서 Trobai NSAi와 비교 모델 4종의 해 품질, 미완성 건수, 인스턴스당 비용, 소요 시간을 비교한 표</caption>
+                            <thead>
+                                <tr class="border-b hair bg-paper">
+                                    <th scope="col" class="text-left font-mono text-[10px] tracking-wide text-ink/45 p-5 font-normal"><span class="sr-only">측정 항목</span></th>
+                                    <th scope="col" class="text-left p-5 font-display font-bold text-blue">Trobai NSAi</th>
+                                    <th scope="col" class="text-left p-5 font-medium text-ink/70">Frontier A</th>
+                                    <th scope="col" class="text-left p-5 font-medium text-ink/70">Frontier B</th>
+                                    <th scope="col" class="text-left p-5 font-medium text-ink/70">Cheap A</th>
+                                    <th scope="col" class="text-left p-5 font-medium text-ink/70">Cheap B</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#E6E6E1]">
+                                <tr>
+                                    <th scope="row" class="p-5 font-medium text-left">해 품질 · 평균 <span class="font-mono text-[10px] text-ink/40">(미완성 제외)</span></th>
+                                    <td class="p-5 font-display font-bold text-blue text-lg">100</td>
+                                    <td class="p-5 text-ink/70">96.9</td>
+                                    <td class="p-5 text-ink/70">97.5</td>
+                                    <td class="p-5 text-ink/70">92.0</td>
+                                    <td class="p-5 text-ink/70">89.3</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" class="p-5 font-medium text-left">미완성 · 무응답</th>
+                                    <td class="p-5 font-display font-bold text-blue text-lg">0건</td>
+                                    <td class="p-5 text-ink/70">0건</td>
+                                    <td class="p-5 text-ink/70">5건</td>
+                                    <td class="p-5 text-ink/70">2건</td>
+                                    <td class="p-5 text-ink/70">6건</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" class="p-5 font-medium text-left">인스턴스당 비용</th>
+                                    <td class="p-5 font-display font-bold text-blue text-lg">₩0.43</td>
+                                    <td class="p-5 text-ink/70">₩15,836</td>
+                                    <td class="p-5 text-ink/70">₩2,825</td>
+                                    <td class="p-5 text-ink/70">₩1,337</td>
+                                    <td class="p-5 text-ink/70">₩1,145</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" class="p-5 font-medium text-left">소요 시간 · 중앙값</th>
+                                    <td class="p-5 font-display font-bold text-blue text-lg">15초</td>
+                                    <td class="p-5 text-ink/70">911초</td>
+                                    <td class="p-5 text-ink/70">237초</td>
+                                    <td class="p-5 text-ink/70">154초</td>
+                                    <td class="p-5 text-ink/70">213초</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-6 reveal">
+                        <p class="font-mono text-[10px] leading-relaxed text-ink/45">
+                            78개 인스턴스 · 학습에 사용되지 않은 문제로 테스트 · 2026-07-30 실행 · NSAi V1.0.0 · 각 인스턴스 10회 시도 중앙값<br>
+                            소요 시간은 기록이 남은 인스턴스만 집계 (모델별 58–66건 / 78) · 비교 모델은 프론티어 2종 · 저가 2종<br>
+                            <span class="text-ink/60">모델명과 원본 실행 로그는 요청 시 제공합니다.</span>
+                        </p>
+                    </div>
+
+                    <div class="mt-10 border-l-2 border-hair pl-6 md:pl-8 py-2 reveal">
+                        <p class="text-lg md:text-xl text-ink/80 leading-relaxed max-w-3xl">
+                            해 품질의 중앙값은 <span class="text-ink font-semibold">네 모델 모두 우리와 동점</span>이었습니다.
+                            제약이 하나뿐인 교과서 문제(배낭·빈패킹)에서는 대등합니다.
+                        </p>
+                    </div>
+
+                    <!-- 앞 표의 반전 — 제약이 겹칠 때 -->
+                    <div class="mt-20 reveal">
+                        <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-6">그런데 제약이 겹치면, 격차가 벌어진다</div>
+                        <div class="border hair bg-white overflow-x-auto" tabindex="0" role="region" aria-label="제약이 겹치는 산업 문제 5종의 모델별 점수 비교표">
+                            <table class="w-full text-sm border-collapse min-w-[760px]">
+                                <caption class="sr-only">제약이 세 개 이상 겹치는 산업 문제 5종에서 Trobai NSAi와 비교 모델 4종이 받은 점수를 비교한 표. 0은 무응답 또는 제약 위반을 뜻합니다.</caption>
+                                <thead>
+                                    <tr class="border-b hair bg-paper">
+                                        <th scope="col" class="text-left p-5 font-mono text-[10px] tracking-wide text-ink/45 font-normal">산업 문제</th>
+                                        <th scope="col" class="text-left p-5 font-display font-bold text-blue">NSAi</th>
+                                        <th scope="col" class="text-left p-5 font-medium text-ink/70">Frontier A</th>
+                                        <th scope="col" class="text-left p-5 font-medium text-ink/70">Frontier B</th>
+                                        <th scope="col" class="text-left p-5 font-medium text-ink/70">Cheap A</th>
+                                        <th scope="col" class="text-left p-5 font-medium text-ink/70">Cheap B</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#E6E6E1]">
+                                    <tr>
+                                        <th scope="row" class="p-5 text-left font-medium">컨테이너 적재<span class="block font-mono text-[10px] text-ink/40 mt-1 font-normal">10 박스타입 · 21개 · 중량 제한</span></th>
+                                        <td class="p-5 font-display font-bold text-blue text-lg">100</td>
+                                        <td class="p-5 font-semibold text-[#dc2626]">0</td>
+                                        <td class="p-5 font-semibold text-[#dc2626]">0</td>
+                                        <td class="p-5 text-ink/70">71.6</td>
+                                        <td class="p-5 font-semibold text-[#dc2626]">0</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="p-5 text-left font-medium">승무원 배치<span class="block font-mono text-[10px] text-ink/40 mt-1 font-normal">525 항공편 × 8 속성</span></th>
+                                        <td class="p-5 font-display font-bold text-blue text-lg">100</td>
+                                        <td class="p-5 font-semibold text-[#dc2626]">0</td>
+                                        <td class="p-5 text-ink/70">88.7</td>
+                                        <td class="p-5 text-ink/70">34.7</td>
+                                        <td class="p-5 text-ink/70">85.0</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="p-5 text-left font-medium">차량 배송 경로<span class="block font-mono text-[10px] text-ink/40 mt-1 font-normal">30×30 실도로망 · 이중 스킬</span></th>
+                                        <td class="p-5 font-display font-bold text-blue text-lg">100</td>
+                                        <td class="p-5 text-ink/70">79.2</td>
+                                        <td class="p-5 text-ink/70">91.4</td>
+                                        <td class="p-5 text-ink/70">73.6</td>
+                                        <td class="p-5 text-ink/70">75.4</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="p-5 text-left font-medium">픽업 · 배송 경로<span class="block font-mono text-[10px] text-ink/40 mt-1 font-normal">30×30 · 선택적 스킵</span></th>
+                                        <td class="p-5 font-display font-bold text-blue text-lg">100</td>
+                                        <td class="p-5 text-ink/70">91.7</td>
+                                        <td class="p-5 text-ink/70">90.8</td>
+                                        <td class="p-5 text-ink/70">72.2</td>
+                                        <td class="p-5 text-ink/70">84.2</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="p-5 text-left font-medium">작업 배정<span class="block font-mono text-[10px] text-ink/40 mt-1 font-normal">10 작업자 × 40 작업</span></th>
+                                        <td class="p-5 font-display font-bold text-blue text-lg">100</td>
+                                        <td class="p-5 font-semibold text-[#dc2626]">0</td>
+                                        <td class="p-5 text-ink/70">98.6</td>
+                                        <td class="p-5 text-ink/70">87.5</td>
+                                        <td class="p-5 text-ink/70">98.3</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="mt-5 font-mono text-[10px] leading-relaxed text-ink/45">
+                            <span class="text-[#dc2626]">0</span> = 무응답 또는 제약 위반 · 네 모델 모두 NSAi 미만인 7개 인스턴스 중 5개 · 각 인스턴스 10회 시도 중앙값<br>
+                            비교 모델 열은 위 표와 동일한 순서입니다.
+                        </p>
+                        <div class="mt-8 border-l-2 border-blue pl-6 md:pl-8 py-2">
+                            <p class="text-lg md:text-xl text-ink/80 leading-relaxed max-w-3xl">
+                                차이는 <span class="text-ink font-semibold">제약이 3개 이상 겹치는 실제 산업 문제</span>에서 갈립니다.
+                                컨테이너 적재, 승무원 배치, 작업 배정에서는 <span class="text-ink font-semibold">아예 답을 못 낸 경우</span>도 있었습니다.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- structural differences -->
+                    <div class="mt-20 reveal">
+                        <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-6">STRUCTURAL · 수치로 안 잡히는 다섯 가지</div>
+                        <div class="border hair bg-white overflow-x-auto" tabindex="0" role="region" aria-label="NSAi와 범용 LLM의 구조적 차이 비교표">
+                            <table class="w-full text-sm border-collapse min-w-[600px]">
+                                <caption class="sr-only">제약 충족 보장, 재현성, 문제 크기 상한, 비용·시간 예측, 온프레미스 설치에서 NSAi와 범용 LLM 4종의 차이를 비교한 표</caption>
+                                <thead>
+                                    <tr class="border-b hair bg-paper">
+                                        <th scope="col" class="text-left p-5 font-mono text-[10px] tracking-wide text-ink/45 font-normal"><span class="sr-only">비교 항목</span></th>
+                                        <th scope="col" class="text-left p-5 font-display font-bold text-blue">NSAi</th>
+                                        <th scope="col" class="text-left p-5 font-medium text-ink/70">범용 LLM <span class="font-mono text-[10px] text-ink/40">(4종 공통)</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#E6E6E1]">
+                                    <tr>
+                                        <th scope="row" class="p-5 font-medium text-left">제약 충족 보장</th>
+                                        <td class="p-5 text-ink/80">검증 통과한 해만 출력</td>
+                                        <td class="p-5 text-ink/55">자가보고 — 재검증 필요</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="p-5 font-medium text-left">결정론적 재현성</th>
+                                        <td class="p-5 text-ink/80">같은 입력 → 같은 출력</td>
+                                        <td class="p-5 text-ink/55">실행마다 결과 달라짐</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="p-5 font-medium text-left">문제 크기 상한</th>
+                                        <td class="p-5 text-ink/80">없음</td>
+                                        <td class="p-5 text-ink/55">출력 토큰 한계로 무응답 발생</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="p-5 font-medium text-left">비용 · 시간 예측</th>
+                                        <td class="p-5 text-ink/80">인스턴스당 고정</td>
+                                        <td class="p-5 text-ink/55">₩7–₩15,114 · 12초–47분</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="p-5 font-medium text-left">온프레미스 설치</th>
+                                        <td class="p-5 text-ink/80">가능 (로컬 EXAONE)</td>
+                                        <td class="p-5 text-ink/55">API 전송 필수</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="mt-5 font-mono text-[10px] leading-relaxed text-ink/45">
+                            비용 · 시간 범위는 에이전트 실행 구성으로 별도 측정한 인스턴스별 최소–최대입니다.
+                            위 벤치마크 표의 인스턴스당 비용과는 측정 구성이 달라 직접 비교되지 않습니다.
+                        </p>
+                        <p class="mt-6 text-lg text-ink/70">여기는 튜닝으로 좁혀지지 않습니다. <span class="text-ink font-semibold">구조가 다르기 때문입니다.</span></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4.8 · ON-PREMISE -->
+            <section class="bg-white border-y hair">
+                <div class="max-w-[88rem] mx-auto px-6 py-24 md:py-28">
+                    <div class="grid lg:grid-cols-12 gap-12">
+                        <div class="lg:col-span-5 reveal">
+                            <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-6 flex items-center gap-3">
+                                <span class="inline-block w-8 h-px bg-blue"></span>
+                                ON-PREMISE
+                            </div>
+                            <h2 class="font-display text-4xl md:text-5xl font-bold tracking-tight leading-[1.05]">공장 안에<br>설치됩니다</h2>
+                            <p class="mt-8 text-lg text-ink/65 leading-relaxed max-w-md">
+                                보안 요구가 높은 사업장은 API 경유 없이 로컬 배포가 가능합니다. 제조 현장에서는 이 점이 도입 여부를 가릅니다.
+                            </p>
+                        </div>
+                        <div class="lg:col-span-7 reveal" style="transition-delay:140ms;">
+                            <div class="grid sm:grid-cols-2 gap-px bg-hair border hair">
+                                <div class="bg-paper p-8">
+                                    <i data-lucide="server" class="w-5 h-5 text-blue mb-4"></i>
+                                    <h3 class="text-lg font-semibold mb-1">EXAONE API</h3>
+                                    <div class="font-mono text-[10px] tracking-wide text-ink/40 mb-3">FriendliAI 엔드포인트</div>
+                                    <p class="text-sm text-ink/60 leading-relaxed">벤치마크 실측에 사용된 구성입니다.</p>
+                                </div>
+                                <div class="bg-paper p-8">
+                                    <i data-lucide="factory" class="w-5 h-5 text-blue mb-4"></i>
+                                    <h3 class="text-lg font-semibold mb-1">로컬 EXAONE</h3>
+                                    <div class="font-mono text-[10px] tracking-wide text-ink/40 mb-3">경량 모델 파인튜닝</div>
+                                    <p class="text-sm text-ink/60 leading-relaxed">공정 데이터가 사업장을 벗어나지 않습니다.</p>
+                                </div>
+                            </div>
+                            <p class="mt-5 text-sm text-ink/60">두 경로 모두 실제 동작을 확인했습니다.</p>
+                            <p class="mt-3 font-mono text-[10px] leading-relaxed text-ink/40">
+                                위 벤치마크 수치는 API 구성의 실측값입니다. 경량 모델 구성의 성능은 별도 측정을 진행 중입니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4.9 · SAME ENGINE, MANY DOMAINS -->
+            <section class="bg-paper">
+                <div class="max-w-[88rem] mx-auto px-6 py-28 md:py-36">
+                    <div class="reveal max-w-3xl mb-14">
+                        <div class="font-mono text-[11px] tracking-[0.22em] text-blue mb-6 flex items-center gap-3">
+                            <span class="inline-block w-8 h-px bg-blue"></span>
+                            EXPANSION
+                        </div>
+                        <h2 class="font-display text-4xl md:text-6xl font-bold tracking-tight leading-[1.02]">같은 엔진입니다</h2>
+                        <p class="mt-8 text-lg text-ink/65 leading-relaxed">
+                            제약을 만족하는 조합을 찾는 문제라면, 도메인은 갈아 끼우면 됩니다.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-px bg-hair border hair reveal">
+                        <div class="bg-white p-7">
+                            <i data-lucide="factory" class="w-5 h-5 text-blue mb-4"></i>
+                            <div class="text-base font-semibold">제조 스케줄링</div>
+                            <div class="font-mono text-[10px] tracking-wide text-blue mt-1">현재</div>
+                        </div>
+                        <div class="bg-white p-7">
+                            <i data-lucide="truck" class="w-5 h-5 text-blue mb-4"></i>
+                            <div class="text-base font-semibold">물류 배차</div>
+                            <div class="font-mono text-[10px] tracking-wide text-blue mt-1">현재</div>
+                        </div>
+                        <div class="bg-white p-7">
+                            <i data-lucide="calendar-range" class="w-5 h-5 text-ink/35 mb-4"></i>
+                            <div class="text-base font-semibold text-ink/70">홈쇼핑 편성</div>
+                            <div class="font-mono text-[10px] tracking-wide text-ink/35 mt-1">확장</div>
+                        </div>
+                        <div class="bg-white p-7">
+                            <i data-lucide="navigation" class="w-5 h-5 text-orange mb-4"></i>
+                            <div class="text-base font-semibold">관광 일정</div>
+                            <div class="font-mono text-[10px] tracking-wide text-orange mt-1">AIRNOTTE</div>
+                        </div>
+                        <div class="bg-white p-7">
+                            <i data-lucide="users" class="w-5 h-5 text-ink/35 mb-4"></i>
+                            <div class="text-base font-semibold text-ink/70">인력 배치</div>
+                            <div class="font-mono text-[10px] tracking-wide text-ink/35 mt-1">확장</div>
                         </div>
                     </div>
                 </div>
@@ -318,13 +1124,15 @@
                         <div>
                             <div class="font-mono text-[11px] tracking-[0.22em] text-orange mb-6 flex items-center gap-3">
                                 <span class="inline-block w-8 h-px bg-orange"></span>
-                                THE PRODUCT
+                                적용 사례 · 관광
                             </div>
                             <h2 class="font-display text-4xl md:text-6xl font-bold tracking-tight">AirNotte</h2>
-                            <p class="mt-5 text-lg text-paper/55 max-w-lg leading-relaxed">대화 몇 번이면, 동선과 검증이 끝난 완성형 여행 일정.</p>
+                            <p class="mt-5 text-lg text-paper/55 max-w-lg leading-relaxed">
+                                같은 엔진을 관광 도메인에 얹은 제품입니다. 동선 최적화와 실시간 검증이 끝난 여행 일정을 대화만으로 만듭니다.
+                            </p>
                         </div>
                         <button onclick="switchSection('airnotte','services')" class="group font-mono text-xs tracking-[0.18em] text-orange flex items-center gap-2 hover:gap-3 transition-all">
-                            제품 보기 <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                            자세히 보기 <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
                         </button>
                     </div>
 
@@ -402,7 +1210,7 @@
                                 THE PEDIGREE
                             </div>
                             <h2 class="font-display text-4xl md:text-5xl font-bold tracking-tight leading-[1.05]">학술적 토대<br>위에 짓습니다</h2>
-                            <p class="mt-6 text-ink/60 leading-relaxed max-w-sm">우리의 기술은 논문과 특허로 증명됩니다. 단순한 서비스가 아니라 검증된 연구의 산물입니다.</p>
+                            <p class="mt-6 text-ink/60 leading-relaxed max-w-sm">우리의 기술은 논문으로 검증되었고, 특허 3건을 출원했습니다. 단순한 서비스가 아니라 검증된 연구의 산물입니다.</p>
                         </div>
                         <div class="lg:col-span-8 reveal" style="transition-delay:140ms;">
                             <ul class="divide-y hair border-y hair">
@@ -436,9 +1244,9 @@
             <!-- 7 · ROADMAP — one quiet line -->
             <section class="bg-white border-y hair">
                 <div class="max-w-[88rem] mx-auto px-6 py-20 flex items-center gap-5">
-                    <span class="font-mono text-[10px] tracking-[0.22em] text-ink/40 shrink-0">NEXT</span>
+                    <span class="font-mono text-[10px] tracking-[0.22em] text-ink/40 shrink-0">TROBAI</span>
                     <span class="h-px flex-1 bg-hair"></span>
-                    <span class="font-display text-xl md:text-2xl font-medium text-ink/70 tracking-tight">다음 제품을 준비 중입니다.</span>
+                    <span class="font-display text-xl md:text-2xl font-medium text-ink/70 tracking-tight">답을 지어내지 않는 AI입니다.</span>
                 </div>
             </section>
 
@@ -490,7 +1298,7 @@
                 <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-hair border hair reveal">
                     <div class="bg-white p-8">
                         <div class="font-mono text-[10px] tracking-[0.18em] text-ink/40 mb-2">회사명</div>
-                        <div class="text-lg font-semibold">주식회사 트로바이 (Trobai)</div>
+                        <div class="text-lg font-semibold">주식회사 트로바이(Trobai)</div>
                     </div>
                     <div class="bg-white p-8">
                         <div class="font-mono text-[10px] tracking-[0.18em] text-ink/40 mb-2">대표이사</div>
@@ -532,7 +1340,7 @@
                         <li class="relative">
                             <span class="absolute -left-[2.6rem] top-1.5 w-2.5 h-2.5 rounded-full bg-blue ring-4 ring-paper"></span>
                             <div class="font-mono text-xs text-blue mb-1">NOW</div>
-                            <div class="text-lg font-semibold">AirNotte 준비중</div>
+                            <div class="text-lg font-semibold">AirNotte 준비 중</div>
                         </li>
                     </ul>
                 </div>
@@ -731,6 +1539,20 @@
 
                     <div class="border hair bg-white p-8 md:p-12 reveal" style="transition-delay:160ms;">
                         <form id="contactForm" onsubmit="submitContact(event)" class="space-y-6">
+                            <div class="grid sm:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="f-name" class="block font-mono text-[10px] tracking-[0.18em] text-ink/45 mb-2">이름</label>
+                                    <input id="f-name" type="text" name="name" required maxlength="50" autocomplete="name" class="w-full px-5 py-4 bg-paper border hair focus:outline-none focus:border-blue focus:ring-1 focus:ring-blue transition-colors" placeholder="홍길동">
+                                </div>
+                                <div>
+                                    <label for="f-company" class="block font-mono text-[10px] tracking-[0.18em] text-ink/45 mb-2">회사명</label>
+                                    <input id="f-company" type="text" name="company" required maxlength="80" autocomplete="organization" class="w-full px-5 py-4 bg-paper border hair focus:outline-none focus:border-blue focus:ring-1 focus:ring-blue transition-colors" placeholder="주식회사 트로바이">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="f-email" class="block font-mono text-[10px] tracking-[0.18em] text-ink/45 mb-2">이메일 <span class="text-blue normal-case tracking-normal">— 답변을 이 주소로 보내드립니다</span></label>
+                                <input id="f-email" type="email" name="email" required maxlength="120" autocomplete="email" inputmode="email" class="w-full px-5 py-4 bg-paper border hair focus:outline-none focus:border-blue focus:ring-1 focus:ring-blue transition-colors" placeholder="name@company.com">
+                            </div>
                             <div>
                                 <label for="f-subject" class="block font-mono text-[10px] tracking-[0.18em] text-ink/45 mb-2">제목</label>
                                 <input id="f-subject" type="text" name="subject" required class="w-full px-5 py-4 bg-paper border hair focus:outline-none focus:border-blue focus:ring-1 focus:ring-blue transition-colors" placeholder="문의 제목을 입력하세요">
@@ -758,7 +1580,7 @@
             <div class="grid md:grid-cols-12 gap-12 mb-16">
                 <div class="md:col-span-6">
                     <div class="font-display text-2xl font-bold tracking-tight mb-5">Trobai</div>
-                    <p class="text-sm text-ink/55 leading-relaxed max-w-xs">여행의 지능 레이어를 만드는 AI 딥테크 스튜디오.</p>
+                    <p class="text-sm text-ink/55 leading-relaxed max-w-xs">언어로 묻고, 검증된 답을 받는다 — Neuro-Symbolic AI 실행 엔진을 만드는 딥테크 스튜디오.</p>
                 </div>
                 <div class="md:col-span-3">
                     <div class="font-mono text-[10px] tracking-[0.18em] text-ink/40 mb-5">바로가기</div>
@@ -790,14 +1612,16 @@
       import {
         createIcons, ChevronDown, ChevronRight, Navigation, Sparkles, Menu, ArrowRight, ArrowUpRight, ArrowLeft,
         Award, Medal, ScrollText, GraduationCap, ShieldCheck, Wrench, ListChecks, Printer,
-        MessageSquare, CalendarRange, List, MapPin, Route, BrainCircuit, FileText, Mail, Send, Loader2
-      } from 'https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/esm/lucide.js';
+        MessageSquare, CalendarRange, List, MapPin, Route, BrainCircuit, FileText, Mail, Send, Loader2,
+        Play, Server, Factory, Truck, Users, Lock, Repeat, Ban, Cpu, Boxes
+} from 'https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/esm/lucide.js';
 
       window.__lucide = {
         ChevronDown, ChevronRight, Navigation, Sparkles, Menu, ArrowRight, ArrowUpRight, ArrowLeft,
         Award, Medal, ScrollText, GraduationCap, ShieldCheck, Wrench, ListChecks, Printer,
-        MessageSquare, CalendarRange, List, MapPin, Route, BrainCircuit, FileText, Mail, Send, Loader2
-      };
+        MessageSquare, CalendarRange, List, MapPin, Route, BrainCircuit, FileText, Mail, Send, Loader2,
+        Play, Server, Factory, Truck, Users, Lock, Repeat, Ban, Cpu, Boxes
+};
       window.renderIcons = () => createIcons({ icons: window.__lucide });
       window.renderIcons();
     </script>
@@ -831,7 +1655,7 @@
               <dl class="border-t hair divide-y divide-[#E6E6E1] mb-12">
                 <div class="flex flex-col sm:flex-row sm:gap-8 py-4">
                   <dt class="font-mono text-xs text-ink/45 sm:w-40 shrink-0 mb-1 sm:mb-0">상호</dt>
-                  <dd class="text-ink">주식회사 트로바이 (Trobai)</dd>
+                  <dd class="text-ink">주식회사 트로바이(Trobai)</dd>
                 </div>
                 <div class="flex flex-col sm:flex-row sm:gap-8 py-4">
                   <dt class="font-mono text-xs text-ink/45 sm:w-40 shrink-0 mb-1 sm:mb-0">대표이사</dt>
@@ -870,7 +1694,7 @@
             date: '2026.01.19',
             dateISO: '2026-01-19',
             updated: null,
-            pdfUrl: './pdf/설립공고.pdf',
+            pdfUrl: null,
             bodyHtml: `
               <p class="font-semibold text-ink text-lg mb-8">여행의 설렘을 완성하다, 주식회사 트로바이(Trobai)의 새로운 시작!</p>
               <p class="mb-6">고객 여러분, 안녕하십니까?</p>
@@ -949,7 +1773,7 @@
                   <i data-lucide="arrow-left" class="w-4 h-4"></i> 공시 목록
                 </a>
                 <div class="flex items-center gap-5">
-                  <button type="button" onclick="window.print()"
+                  <button type="button" onclick="printNotice()"
                           class="inline-flex items-center gap-2 text-sm text-ink/65 hover:text-blue transition-colors">
                     <i data-lucide="printer" class="w-4 h-4"></i> 인쇄
                   </button>
@@ -994,10 +1818,7 @@
         window.openNotice = openNotice;
 
         function switchSection(id, navKey) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            const target = document.getElementById(id);
-            if (!target) return;
-            target.classList.add('active');
+            if (!activateSection(id)) return;
             window.scrollTo(0, 0);
 
             if (('#' + id) !== window.location.hash) {
@@ -1013,20 +1834,94 @@
         }
         window.switchSection = switchSection;
 
-        function setMenu(open) {
-            document.getElementById('mobile-nav').classList.toggle('translate-x-full', !open);
-            document.getElementById('menuBtn').setAttribute('aria-expanded', open ? 'true' : 'false');
+        /* ===================== Demo video facade ===================== */
+        function playVid(btn) {
+            const id = btn.dataset.yt;
+            if (!id || !/^[\w-]{6,20}$/.test(id)) return;
+            const start = String(parseInt(btn.dataset.start, 10) || 0);
+            const wrap = btn.parentElement;
+            if (!wrap) return;
+            const frame = document.createElement('div');
+            frame.style.cssText = 'position:relative;aspect-ratio:16/9;background:#000;';
+            frame.tabIndex = -1;
+            const iframe = document.createElement('iframe');
+            iframe.src = `https://www.youtube-nocookie.com/embed/${id}?start=${start}&autoplay=1&rel=0&modestbranding=1`;
+            iframe.title = btn.getAttribute('aria-label') || 'Trobai NSAi 데모';
+            iframe.allow = 'accelerometer; autoplay; encrypted-media; picture-in-picture; fullscreen';
+            iframe.setAttribute('allowfullscreen', '');
+            iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+            iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;';
+            frame.appendChild(iframe);
+            frame._facade = btn;
+            wrap.replaceChild(frame, btn);
+            frame.focus();
         }
+        window.playVid = playVid;
+
+        /* 섹션을 벗어날 때 재생 중인 데모를 걷어냄 — display:none 뒤에서 오디오가 계속 나는 것 방지 */
+        function stopDemoVideos() {
+            document.querySelectorAll('iframe[src*="youtube-nocookie"]').forEach(f => {
+                const frame = f.parentElement;
+                const wrap = frame && frame.parentElement;
+                if (frame && wrap && frame._facade) wrap.replaceChild(frame._facade, frame);
+                else if (frame) frame.remove();
+            });
+        }
+
+        /* in-page anchor scroll (home section only) */
+        function scrollToId(e, id) {
+            if (e) e.preventDefault();
+            const target = document.getElementById(id);
+            if (!target) return;
+            target.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+        }
+        window.scrollToId = scrollToId;
+
+        /* 공시 상세 인쇄 — printing-notice 플래그를 켠 상태에서만 인쇄 */
+        function printNotice() {
+            document.body.classList.add('printing-notice');
+            const clear = () => document.body.classList.remove('printing-notice');
+            window.addEventListener('afterprint', clear, { once: true });
+            setTimeout(clear, 3000);
+            window.print();
+        }
+        window.printNotice = printNotice;
+
+        function setMenu(open) {
+            const nav = document.getElementById('mobile-nav');
+            const btn = document.getElementById('menuBtn');
+            nav.classList.toggle('translate-x-full', !open);
+            /* 닫힌 상태에서 화면 밖 버튼이 탭 순서·스크린리더에 남지 않도록 */
+            nav.inert = !open;
+            nav.setAttribute('aria-hidden', open ? 'false' : 'true');
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            btn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
+        }
+        /* 열린 모바일 메뉴는 Esc로 닫기 */
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape') return;
+            const nav = document.getElementById('mobile-nav');
+            if (nav && !nav.classList.contains('translate-x-full')) {
+                setMenu(false);
+                document.getElementById('menuBtn').focus();
+            }
+        });
+
         function toggleMenu() {
             const closed = document.getElementById('mobile-nav').classList.contains('translate-x-full');
             setMenu(closed);
         }
         window.toggleMenu = toggleMenu;
 
+        /* 라우트 섹션(.section)만 활성화 대상. #demo 같은 홈 내부 앵커 id가 들어와도
+           기존 섹션을 끄지 않는다 — 끄고 나서 실패하면 빈 화면이 됨. */
         function activateSection(secId) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            const target = document.getElementById(secId);
+            let target = null;
+            try { target = document.querySelector('#' + CSS.escape(secId) + '.section'); }
+            catch (e) { return false; }
             if (!target) return false;
+            stopDemoVideos();
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             target.classList.add('active');
             return true;
         }
@@ -1034,12 +1929,17 @@
         function initFromHash() {
             const hash = (window.location.hash || '').substring(1);
             const [secId, sub] = hash.split('/');
-            if (secId && document.getElementById(secId)) {
-                activateSection(secId);
+            if (secId && activateSection(secId)) {
                 if (secId === 'disclosure') renderDisclosure(sub || null);
                 else window.scrollTo(0, 0);
                 revealCheck();
                 if (window.renderIcons) window.renderIcons();
+            } else if (secId && document.getElementById(secId)) {
+                /* 홈 안쪽 앵커(#demo 등) 딥링크 — 홈을 띄우고 해당 위치로 스크롤 */
+                activateSection('home');
+                revealCheck();
+                if (window.renderIcons) window.renderIcons();
+                requestAnimationFrame(() => scrollToId(null, secId));
             } else {
                 switchSection('home', 'home');
             }
@@ -1048,8 +1948,7 @@
         window.addEventListener('popstate', () => {
             const hash = (window.location.hash || '').substring(1) || 'home';
             const [secId, sub] = hash.split('/');
-            if (document.getElementById(secId)) {
-                activateSection(secId);
+            if (activateSection(secId)) {
                 if (secId === 'disclosure') {
                     renderDisclosure(sub || null);
                 } else {
@@ -1057,6 +1956,12 @@
                 }
                 revealCheck();
                 if (window.renderIcons) window.renderIcons();
+                setMenu(false);
+            } else if (document.getElementById(secId)) {
+                activateSection('home');
+                revealCheck();
+                if (window.renderIcons) window.renderIcons();
+                requestAnimationFrame(() => scrollToId(null, secId));
                 setMenu(false);
             }
         });
@@ -1092,6 +1997,9 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
+                        name: form.name.value,
+                        company: form.company.value,
+                        email: form.email.value,
                         subject: form.subject.value,
                         message: form.message.value,
                         botcheck: form.botcheck.value

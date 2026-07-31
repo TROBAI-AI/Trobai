@@ -12,24 +12,42 @@ export default async function handler(req, res) {
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
-    const subject = (body.subject || '').toString().trim();
-    const message = (body.message || '').toString().trim();
-    const botcheck = (body.botcheck || '').toString().trim();
+    const clean = (v, max) => (v || '').toString().trim().slice(0, max);
+
+    const name = clean(body.name, 50);
+    const company = clean(body.company, 80);
+    const email = clean(body.email, 120);
+    const subject = clean(body.subject, 150);
+    const message = clean(body.message, 5000);
+    const botcheck = clean(body.botcheck, 50);
 
     // 허니팟: 봇이 채우는 숨김 필드에 값이 있으면 성공처럼 응답하고 조용히 폐기
     if (botcheck) {
       return res.status(200).json({ success: true });
     }
 
-    if (!subject || !message) {
-      return res.status(400).json({ success: false, message: '제목과 내용을 모두 입력해주세요.' });
+    if (!name || !company || !email || !subject || !message) {
+      return res.status(400).json({ success: false, message: '모든 항목을 입력해주세요.' });
+    }
+
+    // 이메일 형식 검증 — 회신 주소가 잘못되면 문의에 답할 수 없으므로 서버에서도 확인
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      return res.status(400).json({ success: false, message: '이메일 주소를 다시 확인해주세요.' });
     }
 
     const payload = {
       access_key: ACCESS_KEY,
-      subject: `[Trobai 홈페이지 문의] ${subject}`,
-      from_name: 'Trobai 홈페이지',
-      message: `제목: ${subject}\n\n${message}`
+      subject: `[Trobai 문의] ${company} · ${subject}`,
+      from_name: `${name} (${company})`,
+      // Web3Forms가 회신 주소로 사용 — 받은 메일에서 바로 '답장'이 가능해집니다
+      replyto: email,
+      email: email,
+      이름: name,
+      회사명: company,
+      이메일: email,
+      문의제목: subject,
+      문의내용: message,
+      message: `이름: ${name}\n회사명: ${company}\n이메일: ${email}\n제목: ${subject}\n\n${message}`
     };
 
     const w3 = await fetch('https://api.web3forms.com/submit', {
