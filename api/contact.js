@@ -35,6 +35,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, message: '이메일 주소를 다시 확인해주세요.' });
     }
 
+    // Web3Forms 표준 필드만 사용 (ASCII 키). 사람이 읽을 정보는 message 본문에 담습니다.
     const payload = {
       access_key: ACCESS_KEY,
       subject: `[Trobai 문의] ${company} · ${subject}`,
@@ -42,11 +43,8 @@ export default async function handler(req, res) {
       // Web3Forms가 회신 주소로 사용 — 받은 메일에서 바로 '답장'이 가능해집니다
       replyto: email,
       email: email,
-      이름: name,
-      회사명: company,
-      이메일: email,
-      문의제목: subject,
-      문의내용: message,
+      name: name,
+      company: company,
       message: `이름: ${name}\n회사명: ${company}\n이메일: ${email}\n제목: ${subject}\n\n${message}`
     };
 
@@ -55,12 +53,20 @@ export default async function handler(req, res) {
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
     });
-    const data = await w3.json().catch(() => ({}));
 
-    if (data && data.success) {
+    const raw = await w3.text();
+    let data = {};
+    try { data = JSON.parse(raw); } catch (_) { /* JSON이 아니면 아래에서 원문으로 진단 */ }
+
+    if (w3.ok && data && data.success) {
       return res.status(200).json({ success: true, message: '문의가 전송되었습니다.' });
     }
-    return res.status(502).json({ success: false, message: (data && data.message) || '전송에 실패했습니다.' });
+
+    // Vercel 로그에 원문 기록 (access_key는 페이로드에만 있고 여기엔 찍히지 않음)
+    console.error('[web3forms] status=%s body=%s', w3.status, raw.slice(0, 500));
+
+    const detail = (data && data.message) ? data.message : `upstream ${w3.status}`;
+    return res.status(502).json({ success: false, message: `전송에 실패했습니다. (${detail})` });
   } catch (err) {
     return res.status(500).json({ success: false, message: '전송 중 오류가 발생했습니다.' });
   }
